@@ -11,9 +11,17 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
+        public static final int black=0x7f040008;
+        public static final int password_edit=0x7f040004;
+        public static final int password_text=0x7f040003;
         /**  Retrieved via Resources.getColor() and friends. 
          */
         public static final int red=0x7f040000;
+        public static final int ssl_text_label=0x7f040005;
+        public static final int ssl_text_value=0x7f040006;
+        public static final int username_edit=0x7f040002;
+        public static final int username_text=0x7f040001;
+        public static final int white=0x7f040007;
     }
     public static final class dimen {
         /**  Default screen margins, per the Android Design guidelines. 
@@ -28,17 +36,19 @@ public final class R {
         public static final int semi_black=0x7f020001;
     }
     public static final class id {
-        public static final int action_forgot_password=0x7f09000b;
+        public static final int action_forgot_password=0x7f09000d;
+        public static final int fullscreen_custom_content=0x7f090009;
         public static final int login=0x7f090006;
         public static final int login_form=0x7f090003;
         public static final int login_status=0x7f090001;
         public static final int login_status_message=0x7f090002;
+        public static final int main_content=0x7f09000a;
         public static final int password=0x7f090005;
-        public static final int record_layout=0x7f090009;
+        public static final int record_layout=0x7f09000b;
         public static final int recorder_control=0x7f090008;
         public static final int sign_in_button=0x7f090007;
         public static final int surface_camera=0x7f090000;
-        public static final int textView1=0x7f09000a;
+        public static final int textView1=0x7f09000c;
         public static final int username=0x7f090004;
     }
     public static final class layout {
@@ -46,7 +56,8 @@ public final class R {
         public static final int activity_login=0x7f030001;
         public static final int activity_streaming=0x7f030002;
         public static final int activity_token=0x7f030003;
-        public static final int javacvtext_main=0x7f030004;
+        public static final int custom_screen=0x7f030004;
+        public static final int javacvtext_main=0x7f030005;
     }
     public static final class menu {
         public static final int login=0x7f080000;

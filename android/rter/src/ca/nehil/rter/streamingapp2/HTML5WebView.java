@@ -1,3 +1,4 @@
+/*
 package ca.nehil.rter.streamingapp2;
 
 import android.app.Activity;
@@ -33,18 +34,18 @@ public class HTML5WebView extends WebView {
     static final String LOGTAG = "HTML5WebView";
             
         private void init(Context context) {
-                mContext = context;             
-                Activity a = (Activity) mContext;
-                
-                mLayout = new FrameLayout(context);
-                
-                mBrowserFrameLayout = (FrameLayout) LayoutInflater.from(a).inflate(R.layout.custom_screen, null);
-                mContentView = (FrameLayout) mBrowserFrameLayout.findViewById(R.id.main_content);
-                mCustomViewContainer = (FrameLayout) mBrowserFrameLayout.findViewById(R.id.fullscreen_custom_content);
-                
-                mLayout.addView(mBrowserFrameLayout, COVER_SCREEN_PARAMS);
+            mContext = context;             
+            Activity a = (Activity) mContext;
+            
+            mLayout = new FrameLayout(context);
+            
+            mBrowserFrameLayout = (FrameLayout) LayoutInflater.from(a).inflate(R.layout.custom_screen, null);
+            mContentView = (FrameLayout) mBrowserFrameLayout.findViewById(R.id.main_content);
+            mCustomViewContainer = (FrameLayout) mBrowserFrameLayout.findViewById(R.id.fullscreen_custom_content);
+            
+            mLayout.addView(mBrowserFrameLayout, COVER_SCREEN_PARAMS);
 
-                mWebChromeClient = new MyWebChromeClient();
+            mWebChromeClient = new MyWebChromeClient();
             setWebChromeClient(mWebChromeClient);
             
             setWebViewClient(new MyWebViewClient());
@@ -199,3 +200,4 @@ public class HTML5WebView extends WebView {
         static final FrameLayout.LayoutParams COVER_SCREEN_PARAMS =
         new FrameLayout.LayoutParams( ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 }
+*/

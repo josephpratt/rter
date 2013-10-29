@@ -347,7 +347,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		topLayout.addView(cameraView, layoutParam);
 		topLayout.addView(mGLView, layoutParam);
 		
-		
+		/*
 		WebView myWebView = new WebView(this);
 		myWebView.getSettings().setJavaScriptEnabled(true);
 		myWebView.getSettings().setPluginsEnabled(true);
@@ -357,15 +357,23 @@ public class StreamingActivity extends Activity implements LocationListener,
 		myWebView.setBackgroundColor(0);
 		//myWebView.loadData("<html><body><iframe width='350' height='160' src='www.youtube.com/watch?v=cbP2N1BQdYc' frameborder='0' allowfullscreen></iframe></body></html>", "text/html", null);
 		topLayout.addView(myWebView, layoutParam);
+		*/
 		
 		
-		/*
-		VideoView myVideoView = new VideoView(this);
-		myVideoView.setVideoPath("http://rter.zapto.org:8080/v1/videos/230/video.webm");
+		final VideoView myVideoView = new VideoView(this);
+		myVideoView.setVideoURI(Uri.parse("http://rter.zapto.org:8080/v1/videos/230/index.m3u8"));
 		myVideoView.setMediaController(new MediaController(this));
 		topLayout.addView(myVideoView, layoutParam);
 		myVideoView.start();
-		*/
+		/*
+		myVideoView.requestFocus();
+		new Thread(new Runnable() {
+            public void run() {
+            	myVideoView.start();
+
+            }
+        }).start();
+        */
 		
 		
 		FrameLayout preViewLayout = (FrameLayout) myInflate.inflate(
