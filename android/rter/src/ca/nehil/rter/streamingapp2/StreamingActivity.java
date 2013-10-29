@@ -62,6 +62,7 @@ import android.media.MediaRecorder;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.net.LocalSocketAddress;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -87,12 +88,19 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.VideoView;
 import ca.nehil.rter.streamingapp2.GetTokenActivity.HandshakeTask;
 import ca.nehil.rter.streamingapp2.overlay.CameraGLSurfaceView;
 import ca.nehil.rter.streamingapp2.overlay.OverlayController;
 import android.view.KeyEvent;
 import android.view.OrientationEventListener;
 import android.content.res.Configuration;
+
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebSettings.PluginState;
+import android.webkit.WebView;
+import android.widget.MediaController;
 
 import java.nio.ShortBuffer;
 import static com.googlecode.javacv.cpp.opencv_core.*;
@@ -335,9 +343,30 @@ public class StreamingActivity extends Activity implements LocationListener,
 				+ button_height);
 		cameraDevice = openCamera();
 		cameraView = new CameraView(this, cameraDevice);
-
+		
 		topLayout.addView(cameraView, layoutParam);
 		topLayout.addView(mGLView, layoutParam);
+		
+		
+		WebView myWebView = new WebView(this);
+		myWebView.getSettings().setJavaScriptEnabled(true);
+		myWebView.getSettings().setPluginsEnabled(true);
+		myWebView.setWebChromeClient(new WebChromeClient());
+		myWebView.loadUrl("http://rter.zapto.org:8080/v1/videos/230/play");
+		//myWebView.loadUrl("http://www.youtube.com/watch?v=cbP2N1BQdYc");
+		myWebView.setBackgroundColor(0);
+		//myWebView.loadData("<html><body><iframe width='350' height='160' src='www.youtube.com/watch?v=cbP2N1BQdYc' frameborder='0' allowfullscreen></iframe></body></html>", "text/html", null);
+		topLayout.addView(myWebView, layoutParam);
+		
+		
+		/*
+		VideoView myVideoView = new VideoView(this);
+		myVideoView.setVideoPath("http://rter.zapto.org:8080/v1/videos/230/video.webm");
+		myVideoView.setMediaController(new MediaController(this));
+		topLayout.addView(myVideoView, layoutParam);
+		myVideoView.start();
+		*/
+		
 		
 		FrameLayout preViewLayout = (FrameLayout) myInflate.inflate(
 				R.layout.activity_streaming, null);
