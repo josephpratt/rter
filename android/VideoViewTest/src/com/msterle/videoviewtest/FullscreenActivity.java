@@ -27,7 +27,7 @@ public class FullscreenActivity extends Activity {
 	
 	    VideoView vw = (VideoView) findViewById(R.id.videoView);
 	    //vw.setVideoURI(Uri.parse("http://devimages.apple.com/iphone/samples/bipbop/gear4/prog_index.m3u8"));
-	    vw.setVideoURI(Uri.parse("http://rter.zapto.org:8080/v1/videos/230/index.m3u8"));
+	    vw.setVideoURI(Uri.parse("http://rter.zapto.org:8080/v1/videos/262/index.m3u8"));
 	    //
 	    vw.setMediaController(new MediaController(this));
 	    vw.requestFocus();
