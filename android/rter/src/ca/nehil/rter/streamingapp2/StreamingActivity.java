@@ -102,9 +102,9 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 public class StreamingActivity extends Activity implements LocationListener,
 		OnClickListener {
 
-	private static final String SERVER_URL = "http://rter.cim.mcgill.ca";
-	//private static final String SERVER_URL = "http://rter.zapto.org";
-	// private static final String SERVER_URL = "http://142.157.36.21:8000";
+	//private static final String SERVER_URL = "http://rter.cim.mcgill.ca";
+	private static final String SERVER_URL = "http://rter.zapto.org";
+	//private static final String SERVER_URL = "http://132.206.74.103";
 
 	private HandShakeTask handshakeTask = null;
 	private int PutHeadingTimer = 2000; /*

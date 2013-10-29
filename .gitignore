@@ -8,10 +8,11 @@ nohup.out
 *.class
 
 # Folders
-bin
+bin/
+gen/
 pkg
-prototype/videoserver/data/
-!prototype/videoserver/data/log
+prototype/videoserver/data/*
+!prototype/videoserver/data/.gitkeep
 
 ##### Xcode stuff #####
 
