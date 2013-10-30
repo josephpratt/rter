@@ -26,4 +26,13 @@ public class JSInterface {
     	String data = "So much data";
     	return data;
     }
+    
+    /*
+     * JS will call a method here (that you'll need to make once the structure of data is decided)
+     * that will take two pairs of lat longs (one target and one self) and calculate the angle between them.
+     * This will then be returned to JS. 
+     * It may also be possible (depending on the code structure and the flow) that this calculation need not be called
+     * by the JS and is done before any data is sent to JS. So the Java code would then get the lat long, calculate
+     * angle and then send all to JS.
+     */
 }

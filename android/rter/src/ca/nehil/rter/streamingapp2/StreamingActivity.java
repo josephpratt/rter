@@ -71,6 +71,7 @@ import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -304,7 +305,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 		cameraDevice = openCamera();
 		cameraView = new CameraView(this, cameraDevice);
 		
-		WebView mWebView = new WebView(this); //Alok
+		//WebView //removed by jeff - was this making it a local variable?
+		mWebView = new WebView(this); //Alok
 		mWebView.setWebChromeClient(new WebChromeClient());
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new JSInterface(this), "Android");
@@ -701,6 +703,13 @@ public class StreamingActivity extends Activity implements LocationListener,
 		Log.d(TAG, "Location Changed with lat" + lati + " and lng" + longi);
 		// frameInfo.lat = convertfloatToByteArray(lati);
 		// frameInfo.lon = convertStringToByteArray(longi);
+		
+		mWebView.setWebViewClient(new WebViewClient(){
+			@Override
+			public void onPageFinished(WebView view, String url){
+			mWebView.loadUrl("javascript:giveLocation('lat:" + lati +"long:" + longi + "')");
+			}
+		});
 	}
 
 	@Override

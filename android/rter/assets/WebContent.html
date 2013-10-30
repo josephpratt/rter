@@ -4,6 +4,44 @@
 		<meta charset="ISO-8859-1">
 		<title>Insert title here</title>
 		<script type="text/javascript">
+		
+			function init() {
+                var c=document.getElementById("overlay");
+				c.width = window.innerWidth;
+				c.height = window.innerHeight;				
+				setInterval(tick, 500);
+			}
+			
+			function tick() {
+				updateCompass(Math.random()*360);
+			}
+			
+			function deg2rad(deg){
+                return deg*Math.PI/180;
+            }
+                        
+			function updateCompass(heading) {
+                var c=document.getElementById("overlay");
+                var ctx=c.getContext("2d");
+                
+                var compassSize = .15*c.width;
+
+                ctx.clearRect(0,0,c.width,c.height);
+                
+                ctx.save();
+                ctx.translate(c.width-compassSize, 0);
+                ctx.translate(-1,1);
+                ctx.translate(compassSize/2, compassSize/2);
+                ctx.rotate(deg2rad(heading));
+                ctx.beginPath();
+                ctx.moveTo(0,0);
+                ctx.lineTo(0,compassSize/2);
+                ctx.strokeStyle = '#88FF00';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                ctx.restore();
+            }
+            
     		function sendDataToAndroid(data) {
         		Android.getDataFromJS(data);
     		}
@@ -12,12 +50,23 @@
 				var data = Android.sendDataToJS();
 				document.getElementById("mbutton").value = data;
 			}
+			
+			function giveLocation(val) {
+				<!--('lat:" + lati +"long:" + longi + "')");-->
+			}
+		
 		</script>
 	</head>
 	
-	<body>
+	<body onload="init();">
+	<!--
 		<input type="button" value="Send Data to Android log" onClick="sendDataToAndroid('Hello Android!')" />
 		<br>
 		<input type="button" value="Get Data from Android" id="mbutton" onClick="getDataFromAndroid()" />
+		
+		<br>
+	-->
+		<canvas id="overlay" width="0" height="0"></canvas>
+		
 	</body>
 </html>
