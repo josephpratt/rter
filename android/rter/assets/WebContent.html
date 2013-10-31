@@ -2,14 +2,28 @@
 <html>
 	<head>
 		<meta charset="ISO-8859-1">
-		<title>Insert title here</title>
+		<title>rter webview overlay</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js"></script>
 		<script type="text/javascript">
-		
+			
+			$(function() {
+				init();
+			});
+			
+			var c, ctx;
 			function init() {
-                var c=document.getElementById("overlay");
-				c.width = window.innerWidth;
-				c.height = window.innerHeight;				
-				setInterval(tick, 500);
+                c=document.getElementById("overlay");
+                c.width=480;
+                c.height=360;
+                if(0){
+				c.width = $(window).width();
+				c.height = $(window).height();
+				}
+				
+				console.info("WebContent.html init says that the screen is " + c.width.toString() + " x " + c.height.toString());
+				
+				ctx=c.getContext("2d");		
+				if(0){setInterval(tick, 500);}
 			}
 			
 			function tick() {
@@ -19,27 +33,73 @@
 			function deg2rad(deg){
                 return deg*Math.PI/180;
             }
-                        
-			function updateCompass(heading) {
-                var c=document.getElementById("overlay");
-                var ctx=c.getContext("2d");
-                
-                var compassSize = .15*c.width;
+            
+            function clearCanvas(){
+				ctx.clearRect(0, 0, c.width, c.height);
+				c.width = c.width;
+				if(0) {
+				if(STX.isAndroid && !STX.is_chrome){
+					var w=c.width;
+					c.width=1;
+					c.width=w;
+				}
+				}
+			}
+            
+            function drawPoi(_vals) {
+				var vals = _vals.split(",");
+				if(0) console.info(_vals);
+            	if(vals.length != 4) {
+            		console.error("wrong number of arguments!");
+            	}
 
-                ctx.clearRect(0,0,c.width,c.height);
+            	var bearingToPoi = parseFloat(vals[0]);
+            	var distance = parseFloat(vals[1]);
+            	var remoteBearing = parseFloat(vals[2]);
+            	var color = vals[3];
+
+            	ctx.save();
+            	var left = (c.width/2) + (bearingToPoi/60)*c.width;
+            	var width = (c.width - (distance*c.width));
+            	if(width < 10) {
+            		width=10;
+            	}
+            	var top = c.height*0.3;
+            	var height = c.height*0.2;
+            	
+            	console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
+            	
+            	ctx.fillStyle=color;
+				ctx.fillRect(left,top,left+width,top+height);
+            	ctx.restore();
+            }
+            
+			function updateCompass(headingStr) {
+				heading=parseFloat(headingStr);
+				
+                var compassSize = 0.15*c.width;
+
+                clearCanvas();
                 
                 ctx.save();
                 ctx.translate(c.width-compassSize, 0);
-                ctx.translate(-1,1);
+                if(1){ctx.translate(-0.05*c.width, 0.05*c.height);}
                 ctx.translate(compassSize/2, compassSize/2);
-                ctx.rotate(deg2rad(heading));
+                ctx.rotate(deg2rad(-(heading-180)));
                 ctx.beginPath();
                 ctx.moveTo(0,0);
                 ctx.lineTo(0,compassSize/2);
                 ctx.strokeStyle = '#88FF00';
                 ctx.lineWidth = 3;
+                ctx.closePath();
                 ctx.stroke();
-                ctx.restore();
+                ctx.restore();                
+            }
+            
+            function destroyAll() {
+            	ctx.clearRect(0,0, c.width, c.height);
+            	document.removeChild(c);
+            	c=null;
             }
             
     		function sendDataToAndroid(data) {
@@ -51,14 +111,11 @@
 				document.getElementById("mbutton").value = data;
 			}
 			
-			function giveLocation(val) {
-				<!--('lat:" + lati +"long:" + longi + "')");-->
-			}
 		
 		</script>
 	</head>
 	
-	<body onload="init();">
+	<body>
 	<!--
 		<input type="button" value="Send Data to Android log" onClick="sendDataToAndroid('Hello Android!')" />
 		<br>
@@ -66,7 +123,7 @@
 		
 		<br>
 	-->
-		<canvas id="overlay" width="0" height="0"></canvas>
+		<canvas id="overlay" width="50" height="50"></canvas>
 		
 	</body>
 </html>

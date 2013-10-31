@@ -26,7 +26,7 @@ public class JSInterface {
     	String data = "So much data";
     	return data;
     }
-    
+   
     /*
      * JS will call a method here (that you'll need to make once the structure of data is decided)
      * that will take two pairs of lat longs (one target and one self) and calculate the angle between them.

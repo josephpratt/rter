@@ -74,11 +74,13 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import ca.nehil.rter.streamingapp2.overlay.CameraGLSurfaceView;
 import ca.nehil.rter.streamingapp2.overlay.OverlayController;
 import android.view.OrientationEventListener;
 import android.content.res.Configuration;
+import android.webkit.ConsoleMessage;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
@@ -305,11 +307,20 @@ public class StreamingActivity extends Activity implements LocationListener,
 		cameraDevice = openCamera();
 		cameraView = new CameraView(this, cameraDevice);
 		
-		//WebView //removed by jeff - was this making it a local variable?
 		mWebView = new WebView(this); //Alok
-		mWebView.setWebChromeClient(new WebChromeClient());
+		mWebView.setWebChromeClient(new WebChromeClient() {
+			  public boolean onConsoleMessage(ConsoleMessage cm) {
+			    Log.i("MyApplication", cm.message());/* + " -- From line "
+			                         + cm.lineNumber() + " of "
+			                         + cm.sourceId() );*/
+			    return true;
+			  }
+			});
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new JSInterface(this), "Android");
+		mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); //adding software
+		LinearLayout.LayoutParams layoutParamWeb = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+
 		
 		//Get html data
 		InputStream is;
@@ -331,7 +342,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		
 		topLayout.addView(cameraView, layoutParam);
 		topLayout.addView(mGLView, layoutParam);
-		topLayout.addView(mWebView, layoutParam); //End Alok
+		topLayout.addView(mWebView, layoutParamWeb); //End Alok
 		
 		FrameLayout preViewLayout = (FrameLayout) myInflate.inflate(
 				R.layout.activity_streaming, null);
@@ -355,8 +366,62 @@ public class StreamingActivity extends Activity implements LocationListener,
 				}
 			}
 		});
+	}
+	
+	private float oldHeading=-9999;
+	public void redrawWebView() { //public so others can access...
+		if(overlay==null) return;
+		
+		float newHeading = overlay.currentOrientation;
+		
+		if(Math.abs(oldHeading - overlay.currentOrientation) < 3.0) {
+			return;
+		}
+		
+		Log.i("jeffbl", "webview redraw: " + String.valueOf(oldHeading) + " ==> " + String.valueOf(overlay.currentOrientation) + " dif: " + Math.abs(oldHeading - overlay.currentOrientation));
+
+		oldHeading=overlay.currentOrientation;
+		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+")");
+		
+		Location userLoc = new Location("user");
+		Location poiLoc = new Location("poi");
+		
+		userLoc.setLatitude(lati);
+		userLoc.setLongitude(longi);
+		
+		//the POI locations should come from server JSON
+		poiLoc.setLatitude(lati+.0001);
+		poiLoc.setLongitude(longi);
+		
+		float bearingToPoi = userLoc.bearingTo(poiLoc) - newHeading;
+		float remoteBearing = -10; //hard coded for now - should come from server JSON
+		
+		if(Math.abs(bearingToPoi) < 60) {
+			String color = "#000088";
+			if(Math.abs(bearingToPoi) < 8) color="#8888FF"; //make it brighter if in center (proxy for "selecting" it
+			//needs bearingToPoi, distance, remoteBearing, color
+			String url = "javascript:drawPoi(\""
+					+String.valueOf(bearingToPoi) + ","
+					+String.valueOf(userLoc.distanceTo(poiLoc)) + ","
+					+String.valueOf(remoteBearing) + ","
+					+color
+					+"\")";
+			mWebView.loadUrl(url);
+			Log.i("jeffbl", url);
+			
+		}
+		/*
+		//only need to do this first time - just let it fail that once, as new heading will assuredly come soon
+		mWebView.setWebViewClient(new WebViewClient() {
+			   public void onPageFinished(WebView view, String url) {
+			        view.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+")");
+			    }
+			});
+        */
 		
 	}
+	
+	//private void 
 	
 	private Camera openCamera() {
 		Camera cameraDevice = Camera.open();
@@ -525,6 +590,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		frameInfo = new FrameInfo();
 		// openGL overlay
 		overlay = new OverlayController(this);
+		overlay.SetParent(this); //jeffbl new hack method
 		// orientation
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		mAcc = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -704,12 +770,15 @@ public class StreamingActivity extends Activity implements LocationListener,
 		// frameInfo.lat = convertfloatToByteArray(lati);
 		// frameInfo.lon = convertStringToByteArray(longi);
 		
+		//redrawWebView();
+		/*
 		mWebView.setWebViewClient(new WebViewClient(){
 			@Override
 			public void onPageFinished(WebView view, String url){
 			mWebView.loadUrl("javascript:giveLocation('lat:" + lati +"long:" + longi + "')");
 			}
 		});
+		*/
 	}
 
 	@Override

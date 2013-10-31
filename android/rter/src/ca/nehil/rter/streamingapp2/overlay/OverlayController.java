@@ -15,6 +15,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
+import ca.nehil.rter.streamingapp2.StreamingActivity;
 
 /**
  * NORTH: 0 deg
@@ -27,7 +28,7 @@ import android.util.Log;
  */
 public class OverlayController implements SensorEventListener, LocationListener {
 	protected float desiredOrientation;
-	protected float currentOrientation;
+	public float currentOrientation; //jeffbl made public so can be accessed from StreamingActivity
 	protected float deviceOrientation;
 	protected boolean rightSideUp = true;
 	protected boolean freeRoam = true;
@@ -54,7 +55,12 @@ public class OverlayController implements SensorEventListener, LocationListener 
 		
 		orientationFilter = new MovingAverageCompass(30);
 	}
-
+	
+	private StreamingActivity parent; //StreamingActivity, so can tell it when heading updates (jeffbl hack!!)
+	public void SetParent(StreamingActivity _parent){
+		parent = _parent;
+	}
+	
 	/**
 	 * @return the camera GLView
 	 */
@@ -151,6 +157,7 @@ public class OverlayController implements SensorEventListener, LocationListener 
 		// this angle tells us the orientation
 		this.orientationFilter.pushValue((float) Math.toDegrees(orientationValues[0]));
 		this.currentOrientation = this.orientationFilter.getValue() +this.declination;
+		parent.redrawWebView();
 
 		// this is not used currently, 90 when phone facing the sky, -90 when
 		// facing the ground
