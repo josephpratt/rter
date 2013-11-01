@@ -81,6 +81,7 @@ import ca.nehil.rter.streamingapp2.overlay.OverlayController;
 import android.view.OrientationEventListener;
 import android.content.res.Configuration;
 import android.webkit.ConsoleMessage;
+import android.graphics.Color;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
@@ -318,7 +319,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			});
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.addJavascriptInterface(new JSInterface(this), "Android");
-		mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); //adding software
+		//mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); //adding software
 		LinearLayout.LayoutParams layoutParamWeb = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 
 		
@@ -338,7 +339,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 		}
 		
 		mWebView.loadData(htmlString, "text/html", "UTF-8");
-		mWebView.setBackgroundColor(0x00000000); //Set invisible webview
+		//mWebView.setBackgroundColor(0x00000000); //Set invisible webview
+		mWebView.setBackgroundColor(Color.argb(1, 0, 0, 0));
 		
 		topLayout.addView(cameraView, layoutParam);
 		topLayout.addView(mGLView, layoutParam);

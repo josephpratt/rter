@@ -11,13 +11,24 @@
 			});
 			
 			var c, ctx;
+			var camAngle;
 			function init() {
                 c=document.getElementById("overlay");
-                c.width=480;
-                c.height=360;
+                
+                if(1) {
+                	c.width=520;
+                	c.height=400;
+                	camAngle=60;
+                }
+                if(0) {
+                	c.width=326;
+                	c.height=200;
+                	camAngle = 80;
+                }
+                
                 if(0){
-				c.width = $(window).width();
-				c.height = $(window).height();
+					c.width = $(window).width();
+					c.height = $(window).height();
 				}
 				
 				console.info("WebContent.html init says that the screen is " + c.width.toString() + " x " + c.height.toString());
