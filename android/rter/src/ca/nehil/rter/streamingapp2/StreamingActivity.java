@@ -493,7 +493,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 						+ String.valueOf(pois[i].relativeBearingTo(userLoc)) + ","
 						+ String.valueOf(pois[i].distanceTo(userLoc)) + ","
 						+ String.valueOf(pois[i].remoteBearing) + ",\""
-						+ color + "\""
+						+ color + ",\""
+						+ String.valueOf(pois[i].poiId)
+						+ "\""
 						+ ")";
 				mWebView.loadUrl(url);
 				//Log.i("jeffbl", url);
@@ -766,6 +768,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 				try {
 					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), "#ff0000");
 					poilist.add(poi);
+					String url = "javascript:refreshImage("+ String.valueOf(item.getInt("ID")) + ")";
+					mWebView.loadUrl(url);
+					Log.i("jeffbl", url);
 				}
 				catch (JSONException e) {
 					//skip item

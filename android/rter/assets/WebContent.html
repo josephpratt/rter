@@ -67,10 +67,22 @@
     	        	ctx.fillRect(c.width-20,c.height-20,20,20);
     	        	ctx.fillRect(0,0,20,20);
 				}
-				
 			}
+			
+			function gotNewImage() {
+				console.info("got new image");
+			}
+                        
+            var imgCache = new Array();
+            function refreshImage(imgId) {
+            	imgCache[imgId] = new Image();
+            	console.info(imgId.toString());
+            	imgCache[imgId].onLoad=gotNewImage();
+            	string url = "http://rter.zapto.org:8080/v1/videos/230/thumb/000000001.jpg";
+            	imgCache[imgId].src = url;
+            }
             
-            function drawPoi(bearingToPoi, distance, remoteBearing, color) {
+            function drawPoi(bearingToPoi, distance, remoteBearing, color, poiId) {
             	ctx.save();
             	var left = (c.width/2) + (bearingToPoi/camAngle)*c.width;
             	var width = (c.width - (distance*c.width));
@@ -82,8 +94,14 @@
             	
             	if(0) console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
             	
-            	ctx.fillStyle=color;
-            	ctx.fillRect(left,top,width,height);
+            	if(imgCache[poiId] != null) {
+	            	ctx.drawImage(imgCache[poiId], left, top);
+	            }
+            	else {
+            		ctx.fillStyle=color;
+            		ctx.fillRect(left,top,width,height);
+            	}
+            	
             	ctx.restore();
             }
             
