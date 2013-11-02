@@ -401,6 +401,20 @@ public class StreamingActivity extends Activity implements LocationListener,
 		return delta;
 	}
 	
+	class POI {
+		public POI(int _id, float _bearing, float _lat, float _lng) {
+			id = _id;
+			bearing = _bearing;
+			
+			//distance = _distance;
+		}
+		public int id;
+		public float bearing; //bearing relative to user's current location
+		public float distance;
+		public float remoteBearing; //angle of poi relative to user's current bearing
+		public String curThumbnailURL;
+	}
+	
 	public void redrawWebView() { //public so others can access...
 		if(overlay==null) return;
 		
@@ -441,6 +455,10 @@ public class StreamingActivity extends Activity implements LocationListener,
 			mWebView.loadUrl(url);
 			//Log.i("jeffbl", url);
 		}
+	}
+	
+	private void drawPOI(POI poi) {
+		
 	}
 	
 	private Camera openCamera() {
