@@ -440,14 +440,14 @@ public class StreamingActivity extends Activity implements LocationListener,
 			String color = "#888800";
 			if(Math.abs(bearingToPoi)<8) color="#FFFF00"; //make it brighter if in center (proxy for "selecting" it)
 			//needs bearingToPoi, distance, remoteBearing, color
-			String url = "javascript:drawPoi(\""
+			String url = "javascript:drawPoi("
 					+String.valueOf(bearingToPoi) + ","
 					+String.valueOf(userLoc.distanceTo(poiLoc)) + ","
-					+String.valueOf(remoteBearing) + ","
-					+color
-					+"\")";
+					+String.valueOf(remoteBearing) + ",\""
+					+color+"\""
+					+")";
 			mWebView.loadUrl(url);
-			Log.i("jeffbl", url);
+			//Log.i("jeffbl", url);
 		}
 	}
 	

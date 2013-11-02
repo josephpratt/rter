@@ -65,18 +65,7 @@
 				
 			}
             
-            function drawPoi(_vals) {
-				var vals = _vals.split(",");
-				if(0) console.info(_vals);
-            	if(vals.length != 4) {
-            		console.error("wrong number of arguments!");
-            	}
-
-            	var bearingToPoi = parseFloat(vals[0]);
-            	var distance = parseFloat(vals[1]);
-            	var remoteBearing = parseFloat(vals[2]);
-            	var color = vals[3];
-
+            function drawPoi(bearingToPoi, distance, remoteBearing, color) {
             	ctx.save();
             	var left = (c.width/2) + (bearingToPoi/camAngle)*c.width;
             	var width = (c.width - (distance*c.width));
@@ -93,15 +82,7 @@
             	ctx.restore();
             }
             
-			function updateCompass(heading, color) {
-				if(0) {
-				var vals = _vals.split(",");
-				if(0) console.info(_vals);
-
-            	var heading = parseFloat(vals[0]);
-            	var color = vals[1];
-            	}
-            					
+			function updateCompass(heading, color) {            					
 				if(0)console.info("js updateCompass: " + heading.toString());
 				
                 var compassSize = 0.15*c.width;
