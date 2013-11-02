@@ -34,11 +34,13 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.http.client.ClientProtocolException;
+import org.chromium.content_shell.ContentShellActivity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Camera.PreviewCallback;
@@ -343,34 +345,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 		topLayout.addView(mGLView, layoutParam);
 		topLayout.addView(mWebView, layoutParam); //End Alok
 		
-		/*
-		WebView myWebView = new WebView(this);
-		myWebView.getSettings().setJavaScriptEnabled(true);
-		myWebView.getSettings().setPluginsEnabled(true);
-		myWebView.setWebChromeClient(new WebChromeClient());
-		myWebView.loadUrl("http://rter.zapto.org:8080/v1/videos/230/play");
-		//myWebView.loadUrl("http://www.youtube.com/watch?v=cbP2N1BQdYc");
-		myWebView.setBackgroundColor(0);
-		//myWebView.loadData("<html><body><iframe width='350' height='160' src='www.youtube.com/watch?v=cbP2N1BQdYc' frameborder='0' allowfullscreen></iframe></body></html>", "text/html", null);
-		topLayout.addView(myWebView, layoutParam);
-		*/
-		
-		
-		final VideoView myVideoView = new VideoView(this);
-		myVideoView.setVideoURI(Uri.parse("http://rter.zapto.org:8080/v1/videos/230/index.m3u8"));
-		myVideoView.setMediaController(new MediaController(this));
-		topLayout.addView(myVideoView, layoutParam);
-		myVideoView.start();
-		/*
-		myVideoView.requestFocus();
-		new Thread(new Runnable() {
-            public void run() {
-            	myVideoView.start();
-
-            }
-        }).start();
-        */
-		
+		//Intent urlIntent = new Intent(this, ContentShellActivity.class);
+		//urlIntent.setData(Uri.parse("http://www.google.com"));
+		//startActivity(urlIntent);
 		
 		FrameLayout preViewLayout = (FrameLayout) myInflate.inflate(
 				R.layout.activity_streaming, null);

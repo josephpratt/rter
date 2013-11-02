@@ -46,5 +46,9 @@
         <item name="server_1">http://rter.zapto.org</item>
         <item name="server_2">http://132.206.74.103:8000</item>
     </string-array>
+    
+    <!-- Android Chrome View values -->
+    <string name="url_hint">Type URL Here</string>
+    <string name="browser_process_initialization_failed">Initialization failed.</string>
 
 </resources>

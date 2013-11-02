@@ -28,14 +28,12 @@ import org.chromium.content.common.CommandLine;
 import org.chromium.content.common.ProcessInitException;
 import org.chromium.ui.WindowAndroid;
 
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+import ca.nehil.rter.streamingapp2.R;
 
 /**
  * Activity for managing the Content Shell.
  */
-public class ContentShellActivity extends ChromiumActivity implements GestureDetector.OnGestureListener {
-	private GestureDetector gestureDetector;
+public class ContentShellActivity extends ChromiumActivity {
 
     public static final String COMMAND_LINE_FILE = "/data/local/tmp/content-shell-command-line";
     private static final String TAG = "ContentShellActivity";
@@ -69,10 +67,6 @@ public class ContentShellActivity extends ChromiumActivity implements GestureDet
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.content_shell_activity);
-        gestureDetector = new GestureDetector(this, this);
 
         // Initializing the command line must occur before loading the library.
         if (!CommandLine.isInitialized()) {
@@ -181,49 +175,6 @@ public class ContentShellActivity extends ChromiumActivity implements GestureDet
 
         return super.onKeyUp(keyCode, event);
     }
-    
-    @Override
-    public boolean onGenericMotionEvent(MotionEvent event) {
-        gestureDetector.onTouchEvent(event);
-        return true;
-    }
-    
-    @Override
-    public void onBackPressed() {
-        Log.d("Gesture Example", "onBackPressed");
-        Toast.makeText(getApplicationContext(), "Go Back", Toast.LENGTH_SHORT).show();
-    }
-    
-    @Override
-    public boolean onDown(MotionEvent e) {
-        Log.d("Gesture Example", "onDown");
-        return true;
-    }
-    
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        Log.d("Gesture Example", "onFling: velocityX:" + velocityX + " velocityY:" + velocityY);
-        if (velocityX < -3500) {
-            Toast.makeText(getApplicationContext(), "Fling Right", Toast.LENGTH_SHORT).show();
-        } else if (velocityX > 3500) {
-            Toast.makeText(getApplicationContext(), "Fling Left", Toast.LENGTH_SHORT).show();
-        }
-        return true;
-    }
-    
-    @Override
-    public void onLongPress(MotionEvent e) {
-        Log.d("Gesture Example", "onLongPress");
-        Toast.makeText(getApplicationContext(), "Long Press", Toast.LENGTH_SHORT).show();
-    }
-    
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        Log.d("Gesture Test", "onSingleTapUp");
-        Toast.makeText(getApplicationContext(), "Single Tap Up", Toast.LENGTH_SHORT).show();
-        return true;
-    }
-    
 
     @Override
     protected void onNewIntent(Intent intent) {
@@ -323,17 +274,4 @@ public class ContentShellActivity extends ChromiumActivity implements GestureDet
         Shell shell = getActiveShell();
         return shell != null ? shell.getContentView() : null;
     }
-
-	@Override
-	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,
-			float distanceY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public void onShowPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
 }
