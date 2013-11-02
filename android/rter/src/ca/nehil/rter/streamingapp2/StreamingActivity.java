@@ -21,6 +21,7 @@ package ca.nehil.rter.streamingapp2;
 //import static com.googlecode.javacv.cpp.opencv_core.IPL_DEPTH_8U;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,14 +30,28 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONTokener;
 
 import android.app.Activity;
 import android.content.Context;
@@ -86,6 +101,7 @@ import android.webkit.ConsoleMessage;
 import android.graphics.Color;
 import android.os.SystemClock;
 
+
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
 public class StreamingActivity extends Activity implements LocationListener,
@@ -133,6 +149,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 	static boolean isFPS = false;
 
 	private String AndroidId;
+	
+	private POI[] pois;
 
 	private float lati;
 	private float longi;
@@ -453,11 +471,6 @@ public class StreamingActivity extends Activity implements LocationListener,
 		userLoc.setLatitude(lati);
 		userLoc.setLongitude(longi);
 		
-		POI[] pois = new POI[1];
-		//JSON expert - please fill in the array of POI objects. Don't forget to set colors...
-		pois[0] = new POI(1, -10.0, (float)userLoc.getLatitude()+.0001, (float)userLoc.getLongitude()-.0005, "#ffff00");
-		//end JSON expert
-		
 		for (int i=0; i<pois.length; i++) {
 			String color = "#888800";
 			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < 8)
@@ -645,6 +658,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 
 		Log.e(TAG, "onCreate");
 
+		pois = new POI[0];
+		
 		AndroidId = Settings.Secure.getString(getContentResolver(),
 				Settings.Secure.ANDROID_ID);
 		frameInfo = new FrameInfo();
@@ -718,6 +733,75 @@ public class StreamingActivity extends Activity implements LocationListener,
 		// Toast toast = Toast.makeText(this, text, duration);
 		// toast.setGravity(Gravity.TOP|Gravity.RIGHT, 0, 0);
 		// toast.show();
+		
+		Timer timer = new Timer();
+		
+		timer.scheduleAtFixedRate(new TimerTask() {
+		  @Override
+		  public void run() {
+			  updateItems();
+		  }
+		}, 1*1000, 1*1000);
+		
+	}
+	
+	public void updateItems() {
+		String response = request("items");
+		JSONTokener tokener = new JSONTokener(response);
+		try {
+			JSONArray items = new JSONArray(tokener);
+			ArrayList<POI> poilist = new ArrayList<POI>();
+			for(int i = 0; i < items.length(); i++) {
+				JSONObject item = items.getJSONObject(i);
+				try {
+					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), "#ff0000");
+					poilist.add(poi);
+				}
+				catch (JSONException e) {
+					//skip item
+				}
+			}
+			pois = poilist.toArray(pois);
+		} catch(JSONException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public String request(String resource){
+		try {
+			return request(new URI(server_url + "/1.0/" + resource));
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+	
+	public String request(URI resource){
+		Log.d("MSC", "Request: " + resource.toString());
+		HttpClient httpclient = new DefaultHttpClient();
+	    HttpResponse response;
+		try {
+			HttpGet request = new HttpGet(resource);
+			response = httpclient.execute(request);
+			StatusLine statusLine = response.getStatusLine();
+		    if(statusLine.getStatusCode() == HttpStatus.SC_OK){
+		        ByteArrayOutputStream out = new ByteArrayOutputStream();
+		        response.getEntity().writeTo(out);
+		        out.close();
+		        String responseString = out.toString();
+		        return responseString;
+		    } else{
+		        //Closes the connection.
+		        response.getEntity().getContent().close();
+		        throw new IOException(statusLine.getReasonPhrase());
+		    }
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 	public void attemptHandshake() {
@@ -1329,6 +1413,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			// TODO: register the new account here.
 			return true;
 		}
+		
 
 		@Override
 		protected void onPostExecute(final Boolean success) {
