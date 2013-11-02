@@ -196,6 +196,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 	private static final String TAG = "Streaming Activity";
 	FrameLayout topLayout;
 
+	private static final Boolean use_mike_fusion = false;
+	
 	// protected static final String MEDIA_TYPE_IMAGE = null;
 
 	public class NotificationRunnable implements Runnable {
@@ -379,8 +381,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 	private long timeOfLastHeadingUpdate=0;
 	public void headingUpdated() {
 		if(overlay==null) return;
-		//float newHeading = overlay.currentOrientation;
-		float newHeading = (float)mSensorFusion.getHeading();
+		float newHeading;
+		if(use_mike_fusion) newHeading = (float)mSensorFusion.getHeading();
+		else newHeading = overlay.currentOrientation;
 		float headingDelta = Math.abs(minDegreeDelta(oldHeading, newHeading));
 		long curTime = SystemClock.elapsedRealtime();
 		
@@ -411,6 +414,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		public POI(int _poiId, double _remoteBearing, double _lat, double _lng, String _color) {
 			poiId = _poiId;
 			remoteBearing = _remoteBearing; //orientation of device relative to N
+			loc = new Location("poi");
 			loc.setLatitude(_lat);
 			loc.setLongitude(_lng);
 			color = _color;
@@ -614,8 +618,10 @@ public class StreamingActivity extends Activity implements LocationListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		mSensorFusion = new SensorFusion(this);
-		mSensorFusion.resetHeading();
+		if(use_mike_fusion) {
+			mSensorFusion = new SensorFusion(this);
+			mSensorFusion.resetHeading();
+		}
 		
 		storedValues = getSharedPreferences("CommonValues", MODE_PRIVATE);
 		server_url = storedValues.getString("server_url", "not-set");
@@ -726,7 +732,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 	@Override
 	public void onStop() {
 		super.onStop();
-		mSensorFusion.stopListeners();
+		if(use_mike_fusion) mSensorFusion.stopListeners();
 		if (putHeadingfeed != null) {
 			if (putHeadingfeed.isAlive()) {
 				putHeadingfeed.interrupt();
@@ -763,7 +769,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		
 		initLayout();
 		
-		mSensorFusion.initListeners();
+		if(use_mike_fusion) mSensorFusion.initListeners();
 
 	}
 
@@ -1080,14 +1086,12 @@ public class StreamingActivity extends Activity implements LocationListener,
 		@Override
 		public void run() {
 			Log.d(TAG, " Update heading and location thread started");
-			Log.d(TAG, " PutHedingBool : " + PutHeadingBool);
+			Log.d(TAG, " PutHeadingBool : " + PutHeadingBool);
 			while (PutHeadingBool) {
 				long millis = System.currentTimeMillis();
 				this.postHeading();
 				this.getHeading();
 				
-				double heading = mSensorFusion.getHeading();
-
 				try {
 					Thread.sleep((PutHeadingTimer - millis % 1000));
 				} catch (InterruptedException e) {
