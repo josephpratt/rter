@@ -436,8 +436,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 		//public float bearing; //bearing relative to north
 	}
 	
-	public void redrawWebView() { //public so others can access...
+	public void redrawWebView() {
 		if(overlay==null) return;
+		String url; //for calling javascript...
 		
 		//int camAngle = 60; //GNex
 		int camAngle = 80; //glass
@@ -446,6 +447,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		//Log.i("jeffbl", "java compass: " + String.valueOf(newHeading));
 
 		mWebView.loadUrl("javascript:clearCanvas()");
+		
 		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		
@@ -458,22 +460,30 @@ public class StreamingActivity extends Activity implements LocationListener,
 		pois[0] = new POI(1, -10.0, (float)userLoc.getLatitude()+.0001, (float)userLoc.getLongitude()-.0005, "#ffff00");
 		//end JSON expert
 		
+		int mostInFront=0;
+		for(int i=1; i<pois.length-1; i++) {
+			if(Math.abs(pois[mostInFront].relativeBearingTo(userLoc)) > Math.abs(pois[i].relativeBearingTo(userLoc))) mostInFront = i;
+		}
+		
 		for (int i=0; i<pois.length; i++) {
-			String color = "#888800";
-			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < 8)
-				color = "#FFFF00"; // make it brighter if in center (proxy for
-									// "selecting" it)
-			mWebView.loadUrl("javascript:updateCompass("
-					+ String.valueOf(-pois[i].bearingTo(userLoc)) + ",\"" + color + "\")");
+			String color = pois[i].color;
+			if (i==mostInFront)
+				color += "ff"; // make it brighter if the "selected" one
+			else
+				color += "88"; //leave it semi-transparent
+			url = "javascript:updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\")";
+			mWebView.loadUrl(url);
+			//Log.i("jeffbl", url);
 			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < camAngle) {
 				// needs bearingToPoi, distance, remoteBearing, color
-				String url = "javascript:drawPoi("
+				url = "javascript:drawPoi("
 						+ String.valueOf(pois[i].relativeBearingTo(userLoc)) + ","
 						+ String.valueOf(pois[i].distanceTo(userLoc)) + ","
-						+ String.valueOf(pois[i].remoteBearing) + ",\"" + color + "\""
+						+ String.valueOf(pois[i].remoteBearing) + ",\""
+						+ color + "\""
 						+ ")";
 				mWebView.loadUrl(url);
-				// Log.i("jeffbl", url);
+				//Log.i("jeffbl", url);
 			}
 		}
 	}
