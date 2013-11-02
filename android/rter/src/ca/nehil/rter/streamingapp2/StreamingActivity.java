@@ -78,6 +78,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import ca.nehil.rter.streamingapp2.overlay.CameraGLSurfaceView;
 import ca.nehil.rter.streamingapp2.overlay.OverlayController;
+import ca.nehil.rter.streamingapp2.util.SensorFusion;
 import android.view.OrientationEventListener;
 import android.content.res.Configuration;
 import android.webkit.ConsoleMessage;
@@ -114,6 +115,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 	static ParcelFileDescriptor pfd = null;
 	static FileDescriptor fd = null;
 	private Thread putHeadingfeed;
+	
+	private SensorFusion mSensorFusion;
 
 	public MediaRecorder mrec = new MediaRecorder();
 	private CameraGLSurfaceView mGLView;
@@ -375,7 +378,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 	private long timeOfLastHeadingUpdate=0;
 	public void headingUpdated() {
 		if(overlay==null) return;
-		float newHeading = overlay.currentOrientation;
+		//float newHeading = overlay.currentOrientation;
+		float newHeading = (float)mSensorFusion.getHeading();
 		float headingDelta = Math.abs(minDegreeDelta(oldHeading, newHeading));
 		long curTime = SystemClock.elapsedRealtime();
 		
@@ -583,6 +587,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+		mSensorFusion = new SensorFusion(this);
+		mSensorFusion.resetHeading();
+		
 		storedValues = getSharedPreferences("CommonValues", MODE_PRIVATE);
 		server_url = storedValues.getString("server_url", "not-set");
 		// Orientation listenever implementation
@@ -692,6 +699,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 	@Override
 	public void onStop() {
 		super.onStop();
+		mSensorFusion.stopListeners();
 		if (putHeadingfeed != null) {
 			if (putHeadingfeed.isAlive()) {
 				putHeadingfeed.interrupt();
@@ -727,6 +735,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 				SensorManager.SENSOR_DELAY_NORMAL);
 		
 		initLayout();
+		
+		mSensorFusion.initListeners();
 
 	}
 
@@ -1048,6 +1058,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 				long millis = System.currentTimeMillis();
 				this.postHeading();
 				this.getHeading();
+				
+				double heading = mSensorFusion.getHeading();
 
 				try {
 					Thread.sleep((PutHeadingTimer - millis % 1000));
