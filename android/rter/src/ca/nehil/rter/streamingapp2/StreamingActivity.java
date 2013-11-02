@@ -379,11 +379,11 @@ public class StreamingActivity extends Activity implements LocationListener,
 		float headingDelta = Math.abs(minDegreeDelta(oldHeading, newHeading));
 		long curTime = SystemClock.elapsedRealtime();
 		
-		if(headingDelta < 1.0) { //don't bother with small heading updates
+		if(headingDelta < 2.0) { //don't bother with small heading updates
 			return;
 		}
 		else if (headingDelta < 10.0) { //now make sure we're not updating too often for relatively small angle deltas
-			if(curTime - timeOfLastHeadingUpdate < 300) return; //wait a half second to see if more updates come in
+			if(curTime - timeOfLastHeadingUpdate < 500) return; //wait a half second to see if more updates come in
 		}
 		//Log.i("jeffbl", "Time delta: " + String.valueOf(curTime - timeOfLastHeadingUpdate) + " degrees: " + String.valueOf(headingDelta));
 		
@@ -412,7 +412,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 
 		mWebView.loadUrl("javascript:clearCanvas()");
 		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
-		Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
+		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		
 		Location userLoc = new Location("user");
 		Location poiLoc = new Location("poi");
@@ -422,23 +422,15 @@ public class StreamingActivity extends Activity implements LocationListener,
 		
 		//the POI locations should come from server JSON
 		poiLoc.setLatitude(lati-.0001);
-		poiLoc.setLongitude(longi);
+		poiLoc.setLongitude(longi+.00005);
 		
 		float bearingToPoi = minDegreeDelta(userLoc.bearingTo(poiLoc), overlay.currentOrientation);
 		float remoteBearing = -10; //hard coded for now - should come from server JSON
 		
-		/*
-		 String tmpUrl = "javascript:drawPoi(\""
-				+String.valueOf(bearingToPoi) + ","
-				+String.valueOf(userLoc.distanceTo(poiLoc)) + ","
-				+String.valueOf(remoteBearing)
-				+"\")";
-		Log.i("jeffbl", tmpUrl);
-		*/
-
+		String color = "#888800";
+		if(Math.abs(bearingToPoi)<8) color="#FFFF00"; //make it brighter if in center (proxy for "selecting" it)
+		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(-bearingToPoi)+",\"" + color + "\")");
 		if(Math.abs(bearingToPoi) < camAngle) {
-			String color = "#888800";
-			if(Math.abs(bearingToPoi)<8) color="#FFFF00"; //make it brighter if in center (proxy for "selecting" it)
 			//needs bearingToPoi, distance, remoteBearing, color
 			String url = "javascript:drawPoi("
 					+String.valueOf(bearingToPoi) + ","
