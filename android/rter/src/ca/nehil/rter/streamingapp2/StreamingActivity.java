@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -405,6 +406,32 @@ public class StreamingActivity extends Activity implements LocationListener,
 		return delta;
 	}
 	
+	//one location from the server
+	class POI {
+		public POI(int _poiId, double _remoteBearing, double _lat, double _lng, String _color) {
+			poiId = _poiId;
+			remoteBearing = _remoteBearing; //orientation of device relative to N
+			loc.setLatitude(_lat);
+			loc.setLongitude(_lng);
+			color = _color;
+		}
+		public int poiId;
+		Location loc;
+		public double remoteBearing; //angle of device relative to N
+		public String curThumbnailURL;
+		public String color;
+		public float bearingTo(Location fromLoc) {
+			return fromLoc.bearingTo(loc);
+		}
+		public float relativeBearingTo(Location fromLoc) { //bearing relative to user position
+			return minDegreeDelta(fromLoc.bearingTo(loc), overlay.currentOrientation);
+		}
+		public float distanceTo(Location fromLoc) {
+			return fromLoc.distanceTo(loc);
+		}
+		//public float bearing; //bearing relative to north
+	}
+	
 	public void redrawWebView() { //public so others can access...
 		if(overlay==null) return;
 		
@@ -418,32 +445,32 @@ public class StreamingActivity extends Activity implements LocationListener,
 		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		
-		Location userLoc = new Location("user");
-		Location poiLoc = new Location("poi");
-		
+		Location userLoc = new Location("user");		
 		userLoc.setLatitude(lati);
 		userLoc.setLongitude(longi);
 		
-		//the POI locations should come from server JSON
-		poiLoc.setLatitude(lati-.0001);
-		poiLoc.setLongitude(longi+.00005);
+		POI[] pois = new POI[1];
+		//JSON expert - please fill in the array of POI objects. Don't forget to set colors...
+		pois[0] = new POI(1, -10.0, (float)userLoc.getLatitude()+.0001, (float)userLoc.getLongitude()-.0005, "#ffff00");
+		//end JSON expert
 		
-		float bearingToPoi = minDegreeDelta(userLoc.bearingTo(poiLoc), overlay.currentOrientation);
-		float remoteBearing = -10; //hard coded for now - should come from server JSON
-		
-		String color = "#888800";
-		if(Math.abs(bearingToPoi)<8) color="#FFFF00"; //make it brighter if in center (proxy for "selecting" it)
-		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(-bearingToPoi)+",\"" + color + "\")");
-		if(Math.abs(bearingToPoi) < camAngle) {
-			//needs bearingToPoi, distance, remoteBearing, color
-			String url = "javascript:drawPoi("
-					+String.valueOf(bearingToPoi) + ","
-					+String.valueOf(userLoc.distanceTo(poiLoc)) + ","
-					+String.valueOf(remoteBearing) + ",\""
-					+color+"\""
-					+")";
-			mWebView.loadUrl(url);
-			//Log.i("jeffbl", url);
+		for (int i=0; i<pois.length; i++) {
+			String color = "#888800";
+			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < 8)
+				color = "#FFFF00"; // make it brighter if in center (proxy for
+									// "selecting" it)
+			mWebView.loadUrl("javascript:updateCompass("
+					+ String.valueOf(-pois[i].bearingTo(userLoc)) + ",\"" + color + "\")");
+			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < camAngle) {
+				// needs bearingToPoi, distance, remoteBearing, color
+				String url = "javascript:drawPoi("
+						+ String.valueOf(pois[i].relativeBearingTo(userLoc)) + ","
+						+ String.valueOf(pois[i].distanceTo(userLoc)) + ","
+						+ String.valueOf(pois[i].remoteBearing) + ",\"" + color + "\""
+						+ ")";
+				mWebView.loadUrl(url);
+				// Log.i("jeffbl", url);
+			}
 		}
 	}
 	
