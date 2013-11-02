@@ -405,6 +405,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		return delta;
 	}
 	
+	//one location from the server
 	class POI {
 		public POI(int _id, float _bearing, float _lat, float _lng) {
 			id = _id;
