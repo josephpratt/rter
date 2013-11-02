@@ -57,7 +57,7 @@ func Exec(query string, args ...interface{}) (sql.Result, error) {
 // Run a query against the current connected db.
 func Query(query string, args ...interface{}) (*sql.Rows, error) {
 	result, err := db.Query(query, args...)
-	return result, NewStorageError(err)
+	return result, err
 }
 
 // Run an exec against the current connected db. Fatal if the query throws an error.
