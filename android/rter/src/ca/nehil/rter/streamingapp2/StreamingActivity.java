@@ -82,6 +82,7 @@ import android.view.OrientationEventListener;
 import android.content.res.Configuration;
 import android.webkit.ConsoleMessage;
 import android.graphics.Color;
+import android.os.SystemClock;
 
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
@@ -371,19 +372,47 @@ public class StreamingActivity extends Activity implements LocationListener,
 	}
 	
 	private float oldHeading=-9999;
+	private long timeOfLastHeadingUpdate=0;
+	public void headingUpdated() {
+		if(overlay==null) return;
+		float newHeading = overlay.currentOrientation;
+		float headingDelta = Math.abs(minDegreeDelta(oldHeading, newHeading));
+		long curTime = SystemClock.elapsedRealtime();
+		
+		if(headingDelta < 1.0) { //don't bother with small heading updates
+			return;
+		}
+		else if (headingDelta < 10.0) { //now make sure we're not updating too often for relatively small angle deltas
+			if(curTime - timeOfLastHeadingUpdate < 300) return; //wait a half second to see if more updates come in
+		}
+		//Log.i("jeffbl", "Time delta: " + String.valueOf(curTime - timeOfLastHeadingUpdate) + " degrees: " + String.valueOf(headingDelta));
+		
+		//ok, made it through all the checks...do the update.
+		timeOfLastHeadingUpdate = curTime;
+		oldHeading=newHeading;
+		redrawWebView();
+	}
+	
+	private float minDegreeDelta(float deg1, float deg2) {
+		float delta = deg1-deg2;
+		if(delta > 180) delta -= 360;
+		if(delta < -180) delta += 360;
+		
+		return delta;
+	}
+	
 	public void redrawWebView() { //public so others can access...
 		if(overlay==null) return;
 		
-		float newHeading = overlay.currentOrientation;
+		//int camAngle = 60; //GNex
+		int camAngle = 80; //glass
 		
-		if(Math.abs(oldHeading - overlay.currentOrientation) < 3.0) {
-			return;
-		}
-		
-		Log.i("jeffbl", "webview redraw: " + String.valueOf(oldHeading) + " ==> " + String.valueOf(overlay.currentOrientation) + " dif: " + Math.abs(oldHeading - overlay.currentOrientation));
+		//Log.i("jeffbl", "webview redraw: " + String.valueOf(oldHeading) + " ==> " + String.valueOf(newHeading) + " dif: " + Math.abs(oldHeading - overlay.currentOrientation));
+		//Log.i("jeffbl", "java compass: " + String.valueOf(newHeading));
 
-		oldHeading=overlay.currentOrientation;
-		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+")");
+		mWebView.loadUrl("javascript:clearCanvas()");
+		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
+		Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		
 		Location userLoc = new Location("user");
 		Location poiLoc = new Location("poi");
@@ -392,15 +421,24 @@ public class StreamingActivity extends Activity implements LocationListener,
 		userLoc.setLongitude(longi);
 		
 		//the POI locations should come from server JSON
-		poiLoc.setLatitude(lati+.0001);
+		poiLoc.setLatitude(lati-.0001);
 		poiLoc.setLongitude(longi);
 		
-		float bearingToPoi = userLoc.bearingTo(poiLoc) - newHeading;
+		float bearingToPoi = minDegreeDelta(userLoc.bearingTo(poiLoc), overlay.currentOrientation);
 		float remoteBearing = -10; //hard coded for now - should come from server JSON
 		
-		if(Math.abs(bearingToPoi) < 60) {
-			String color = "#000088";
-			if(Math.abs(bearingToPoi) < 8) color="#8888FF"; //make it brighter if in center (proxy for "selecting" it
+		/*
+		 String tmpUrl = "javascript:drawPoi(\""
+				+String.valueOf(bearingToPoi) + ","
+				+String.valueOf(userLoc.distanceTo(poiLoc)) + ","
+				+String.valueOf(remoteBearing)
+				+"\")";
+		Log.i("jeffbl", tmpUrl);
+		*/
+
+		if(Math.abs(bearingToPoi) < camAngle) {
+			String color = "#888800";
+			if(Math.abs(bearingToPoi)<8) color="#FFFF00"; //make it brighter if in center (proxy for "selecting" it)
 			//needs bearingToPoi, distance, remoteBearing, color
 			String url = "javascript:drawPoi(\""
 					+String.valueOf(bearingToPoi) + ","
@@ -410,20 +448,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 					+"\")";
 			mWebView.loadUrl(url);
 			Log.i("jeffbl", url);
-			
 		}
-		/*
-		//only need to do this first time - just let it fail that once, as new heading will assuredly come soon
-		mWebView.setWebViewClient(new WebViewClient() {
-			   public void onPageFinished(WebView view, String url) {
-			        view.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+")");
-			    }
-			});
-        */
-		
 	}
-	
-	//private void 
 	
 	private Camera openCamera() {
 		Camera cameraDevice = Camera.open();

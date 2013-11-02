@@ -157,7 +157,7 @@ public class OverlayController implements SensorEventListener, LocationListener 
 		// this angle tells us the orientation
 		this.orientationFilter.pushValue((float) Math.toDegrees(orientationValues[0]));
 		this.currentOrientation = this.orientationFilter.getValue() +this.declination;
-		parent.redrawWebView();
+		parent.headingUpdated();
 
 		// this is not used currently, 90 when phone facing the sky, -90 when
 		// facing the ground

@@ -16,14 +16,14 @@
                 c=document.getElementById("overlay");
                 
                 if(1) {
-                	c.width=520;
-                	c.height=400;
+                	c.width=524;
+                	c.height=346;
                 	camAngle=60;
                 }
                 if(0) {
-                	c.width=326;
-                	c.height=200;
-                	camAngle = 80;
+                	c.width=358;
+                	c.height=226;
+                	camAngle=80;
                 }
                 
                 if(0){
@@ -35,10 +35,16 @@
 				
 				ctx=c.getContext("2d");		
 				if(0){setInterval(tick, 500);}
+				
 			}
 			
+			var tmpPosition=0;
 			function tick() {
-				updateCompass(Math.random()*360);
+				if(0) tmpPosition = Math.random()*360;
+				tmpPosition+=10;
+				if(tmpPosition>180) tmpPosition-=360;
+				if(0) if(tmpPosition>360) tmpPosition=0;
+				updateCompass(tmpPosition);
 			}
 			
 			function deg2rad(deg){
@@ -46,15 +52,17 @@
             }
             
             function clearCanvas(){
-				ctx.clearRect(0, 0, c.width, c.height);
 				c.width = c.width;
 				if(0) {
-				if(STX.isAndroid && !STX.is_chrome){
-					var w=c.width;
-					c.width=1;
-					c.width=w;
+					ctx.clearRect(0, 0, c.width, c.height);
 				}
+				
+				if(0) {
+	            	ctx.fillStyle="#FFFF00";
+    	        	ctx.fillRect(c.width-20,c.height-20,20,20);
+    	        	ctx.fillRect(0,0,20,20);
 				}
+				
 			}
             
             function drawPoi(_vals) {
@@ -70,49 +78,49 @@
             	var color = vals[3];
 
             	ctx.save();
-            	var left = (c.width/2) + (bearingToPoi/60)*c.width;
+            	var left = (c.width/2) + (bearingToPoi/camAngle)*c.width;
             	var width = (c.width - (distance*c.width));
-            	if(width < 10) {
-            		width=10;
+            	if(width < 30) {
+            		width=30;
             	}
             	var top = c.height*0.3;
-            	var height = c.height*0.2;
+            	var height = c.height*0.1;
             	
-            	console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
+            	if(0) console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
             	
             	ctx.fillStyle=color;
-				ctx.fillRect(left,top,left+width,top+height);
+            	ctx.fillRect(left,top,width,height);
             	ctx.restore();
             }
             
-			function updateCompass(headingStr) {
-				heading=parseFloat(headingStr);
+			function updateCompass(heading, color) {
+				if(0) {
+				var vals = _vals.split(",");
+				if(0) console.info(_vals);
+
+            	var heading = parseFloat(vals[0]);
+            	var color = vals[1];
+            	}
+            					
+				if(0)console.info("js updateCompass: " + heading.toString());
 				
                 var compassSize = 0.15*c.width;
-
-                clearCanvas();
                 
                 ctx.save();
                 ctx.translate(c.width-compassSize, 0);
-                if(1){ctx.translate(-0.05*c.width, 0.05*c.height);}
+                if(1){ctx.translate(-0.03*c.width, 0.03*c.height);}
                 ctx.translate(compassSize/2, compassSize/2);
                 ctx.rotate(deg2rad(-(heading-180)));
                 ctx.beginPath();
                 ctx.moveTo(0,0);
                 ctx.lineTo(0,compassSize/2);
-                ctx.strokeStyle = '#88FF00';
+                ctx.strokeStyle = color;
                 ctx.lineWidth = 3;
                 ctx.closePath();
                 ctx.stroke();
                 ctx.restore();                
             }
-            
-            function destroyAll() {
-            	ctx.clearRect(0,0, c.width, c.height);
-            	document.removeChild(c);
-            	c=null;
-            }
-            
+                        
     		function sendDataToAndroid(data) {
         		Android.getDataFromJS(data);
     		}
