@@ -7,7 +7,6 @@ import (
 	"time"
 	"net/http"
 	"fmt"
-	"strconv"
 	"net"
 )
 
@@ -109,19 +108,17 @@ func scanItem(item *data.Item, rows *sql.Rows) error {
     }
 
 	status := 200
-	thumbnailURI := ""
-	for thumbnailID := 1; status != 404; thumbnailID += 1 {
-		thumbnailURI = fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID)
-		log.Println(thumbnailURI)
+	thumbnailID := 1
+	for ; status != 404; thumbnailID += 1 {
+		thumbnailURI := fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID)
 		resp, err := client.Get(thumbnailURI)
 		if err != nil {
 			break
 		}
 		status = resp.StatusCode
-		log.Println(thumbnailURI + ": " + strconv.Itoa(status))
 		resp.Body.Close()
 	}
-	item.ThumbnailURI = thumbnailURI
+	item.ThumbnailURI = fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID - 1)
 
 	return nil
 }
