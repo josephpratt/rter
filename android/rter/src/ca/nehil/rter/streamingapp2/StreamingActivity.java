@@ -109,6 +109,8 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 public class StreamingActivity extends Activity implements LocationListener,
 		OnClickListener {
 
+	private static final Boolean kc_demo = true;
+	
 	private static String server_url;
 	private SharedPreferences storedValues;
 
@@ -457,10 +459,11 @@ public class StreamingActivity extends Activity implements LocationListener,
 	}
 	
 	private String[] colors = new String[] {"#ff0000", "#0000ff", "#ffff00", "#00ffff", "#ffffff"};
+	private Location userLoc = new Location("user");
 	
 	public void redrawWebView() {
 		if(overlay==null) return;
-		String url; //for calling javascript...
+		String url = "javascript:"; //for calling javascript...
 		
 		//int camAngle = 60; //GNex
 		int camAngle = 80; //glass
@@ -468,16 +471,18 @@ public class StreamingActivity extends Activity implements LocationListener,
 		//Log.i("jeffbl", "webview redraw: " + String.valueOf(oldHeading) + " ==> " + String.valueOf(newHeading) + " dif: " + Math.abs(oldHeading - overlay.currentOrientation));
 		//Log.i("jeffbl", "java compass: " + String.valueOf(newHeading));
 
-		mWebView.loadUrl("javascript:clearCanvas();");
-		//Log.d("JS", "javascript:clearCanvas();");
-		
-		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
-		//Log.d("JS", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
+		url += "clearCanvas();";
+		url += "updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");";
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
-		
-		Location userLoc = new Location("user");		
-		userLoc.setLatitude(lati);
-		userLoc.setLongitude(longi);
+				
+		if(kc_demo) {
+			userLoc.setLatitude(39.050439);
+			userLoc.setLongitude(-94.607237);
+		}
+		else {
+			userLoc.setLatitude(lati);
+			userLoc.setLongitude(longi);
+		}
 		
 		int mostInFront=0;
 		for(int i=1; i<pois.length-1; i++) {
@@ -492,24 +497,20 @@ public class StreamingActivity extends Activity implements LocationListener,
 			else
 				color += "88"; //leave it semi-transparent
 			*/
-			url = "javascript:updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\");";
-			Log.d("JS", url);
-			mWebView.loadUrl(url);
-			//Log.i("jeffbl", url);
+			url += "updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\");";
 			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < camAngle) {
 				// needs bearingToPoi, distance, remoteBearing, color
-				url = "javascript:drawPoi("
+				url += "drawPoi("
 						+ String.valueOf(pois[i].relativeBearingTo(userLoc)) + ","
 						+ String.valueOf(pois[i].distanceTo(userLoc)) + ","
 						+ String.valueOf(pois[i].remoteBearing) + ",\""
 						+ color + "\","
 						+ String.valueOf(pois[i].poiId)
-						+ ")";
-				mWebView.loadUrl(url);
-				//Log.d("JS", url);
-				//Log.i("jeffbl", url);
+						+ ");";
 			}
 		}
+		mWebView.loadUrl(url);
+		Log.d("JS", url);
 	}
 	
 	private Camera openCamera() {
