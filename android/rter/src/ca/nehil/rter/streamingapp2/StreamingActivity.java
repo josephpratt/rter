@@ -480,8 +480,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 				
 		if(kc_demo) {
-			userLoc.setLatitude(39.050439);
-			userLoc.setLongitude(-94.607237);
+			userLoc.setLatitude(39.050402);
+			userLoc.setLongitude(-94.607069);
 		}
 		else {
 			userLoc.setLatitude(lati);
@@ -781,7 +781,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 				JSONObject item = items.getJSONObject(i);
 				try {
 					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"), item.getString("Type"));
-					poilist.add(poi);
+					if(userLoc.distanceTo(poi.loc) < 300.0) {
+						poilist.add(poi);
+					}
 				}
 				catch (JSONException e) {
 					//skip item
