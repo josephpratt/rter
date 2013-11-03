@@ -107,18 +107,21 @@ func scanItem(item *data.Item, rows *sql.Rows) error {
         Transport: &transport,
     }
 
-	status := 200
-	thumbnailID := 1
-	for ; status != 404; thumbnailID += 1 {
+	for thumbnailID := 1; ; thumbnailID += 1 {
 		thumbnailURI := fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID)
 		resp, err := client.Get(thumbnailURI)
 		if err != nil {
 			break
 		}
-		status = resp.StatusCode
+		if resp.StatusCode == 404 {
+			if thumbnailID > 1 {
+				item.ThumbnailURI = fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID - 1)
+			}
+			break
+		}
 		resp.Body.Close()
 	}
-	item.ThumbnailURI = fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID - 1)
+	
 
 	return nil
 }
