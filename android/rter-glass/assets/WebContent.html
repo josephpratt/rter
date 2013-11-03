@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="ISO-8859-1">
+		<title>rter webview overlay</title>
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.2.6/jquery.js"></script>
+		<script type="text/javascript">
+			
+			$(function() {
+				init();
+			});
+			
+			var c, ctx;
+			var camAngle;
+			function init() {
+                c=document.getElementById("overlay");
+                
+                if(0) {
+                	c.width=850;
+                	c.height=500;
+                	camAngle=60;
+				}
+                if(1) {
+                	c.width=524;
+                	c.height=346;
+                	camAngle=60;
+                }
+                if(1) {
+                	c.width=358;
+                	c.height=226;
+                	camAngle=80;
+                }
+                
+                if(0){
+					c.width = $(window).width();
+					c.height = $(window).height();
+				}
+				
+				console.info("WebContent.html init says that the screen is " + c.width.toString() + " x " + c.height.toString());
+				
+				ctx=c.getContext("2d");		
+				if(0){setInterval(tick, 500);}
+				
+			}
+			
+			var tmpPosition=0;
+			function tick() {
+				if(0) tmpPosition = Math.random()*360;
+				tmpPosition+=10;
+				if(tmpPosition>180) tmpPosition-=360;
+				if(0) if(tmpPosition>360) tmpPosition=0;
+				updateCompass(tmpPosition);
+			}
+			
+			function deg2rad(deg){
+                return deg*Math.PI/180;
+            }
+            
+            function clearCanvas(){
+				if(1) c.width = c.width;
+				if(0) ctx.clearRect(0, 0, c.width, c.height);
+				
+				if(0) {
+	            	ctx.fillStyle="#FFFF00";
+    	        	ctx.fillRect(c.width-20,c.height-20,20,20);
+    	        	ctx.fillRect(0,0,20,20);
+				}
+			}
+			
+			function gotNewImage() {
+				if(0) console.info("got new image");
+			}
+                        
+            var imgCache = new Array();
+            function refreshImage(imgId, imgUrl) {
+            	imgCache[imgId] = new Image();
+            	console.info(imgId.toString());
+            	imgCache[imgId].onLoad=gotNewImage();
+            	imgCache[imgId].src = imgUrl;
+            }
+                        
+            function drawPoi(bearingToPoi, distance, remoteBearing, color, poiId) {
+            	if(0)ctx.save();
+            	var left = (c.width/2) + (bearingToPoi/camAngle)*c.width;
+            	var width = (c.width - (distance*c.width));
+            	if(width < 30) {
+            		width=30;
+            	}
+            	var top = c.height*0.3;
+            	var height = c.height*0.1;
+            	
+            	if(0) console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
+            	
+            	if(imgCache[poiId] != null) {
+	            	if(1)ctx.drawImage(imgCache[poiId], left, top);
+	                ctx.strokeStyle = color;
+	            	ctx.rect(left, top, imgCache[poiId].width, imgCache[poiId].height);
+		            ctx.stroke();
+	            }
+            	else {
+	            	ctx.fillStyle=color;
+	            	ctx.lineWidth="3";
+            		ctx.fillRect(left,top,width,height);
+            	}
+            	
+            	if(0)ctx.restore();
+            }
+            
+			function updateCompass(heading, color) {            					
+				if(0)console.info("js updateCompass: " + heading.toString());
+				
+                var compassSize = 0.15*c.width;
+                
+                if(0)ctx.clearRect(c.width-.2*c.width, 0, c.width, c.height*.2);
+                
+                ctx.save();
+                ctx.translate(c.width-compassSize, 0);
+                if(1){ctx.translate(-0.03*c.width, 0.03*c.height);}
+                ctx.translate(compassSize/2, compassSize/2);
+                ctx.rotate(deg2rad(-(heading-180)));
+                ctx.beginPath();
+                ctx.moveTo(0,0);
+                ctx.lineTo(0,compassSize/2);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.closePath();
+                ctx.stroke();
+                ctx.restore();                
+            }
+                        
+    		function sendDataToAndroid(data) {
+        		Android.getDataFromJS(data);
+    		}
+    		
+    		function getDataFromAndroid(){
+				var data = Android.sendDataToJS();
+				document.getElementById("mbutton").value = data;
+			}
+			
+		
+		</script>
+	</head>
+	
+	<body>
+	<!--
+		<input type="button" value="Send Data to Android log" onClick="sendDataToAndroid('Hello Android!')" />
+		<br>
+		<input type="button" value="Get Data from Android" id="mbutton" onClick="getDataFromAndroid()" />
+		
+		<br>
+	-->
+		<canvas id="overlay" width="50" height="50"></canvas>
+		
+	</body>
+</html>
