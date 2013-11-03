@@ -85,6 +85,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.WindowManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
@@ -107,7 +109,7 @@ import android.os.SystemClock;
 import static com.googlecode.javacv.cpp.opencv_core.*;
 
 public class StreamingActivity extends Activity implements LocationListener,
-		OnClickListener {
+		OnClickListener, GestureDetector.OnGestureListener {
 
 	private static final Boolean kc_demo = true;
 	
@@ -433,7 +435,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 	
 	//one location from the server
 	class POI {
-		public POI(int _poiId, double _remoteBearing, double _lat, double _lng, String _color, String _curThumbnailURL) {
+		public POI(int _poiId, double _remoteBearing, double _lat, double _lng, String _color, String _curThumbnailURL, String _type) {
 			poiId = _poiId;
 			remoteBearing = _remoteBearing; //orientation of device relative to N
 			loc = new Location("poi");
@@ -441,12 +443,14 @@ public class StreamingActivity extends Activity implements LocationListener,
 			loc.setLongitude(_lng);
 			color = _color;
 			curThumbnailURL = _curThumbnailURL;
+			type = _type;
 		}
 		public int poiId;
 		Location loc;
 		public double remoteBearing; //angle of device relative to N
 		public String curThumbnailURL;
 		public String color;
+		public String type;
 		public float bearingTo(Location fromLoc) {
 			return fromLoc.bearingTo(loc);
 		}
@@ -776,7 +780,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			for(int i = 0; i < items.length(); i++) {
 				JSONObject item = items.getJSONObject(i);
 				try {
-					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"));
+					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"), item.getString("Type"));
 					if(userLoc.distanceTo(poi.loc) < 300.0) {
 						poilist.add(poi);
 					}
@@ -1340,7 +1344,6 @@ public class StreamingActivity extends Activity implements LocationListener,
 			stopRecording();
 			Log.w(LOG_TAG, "Stop Button Pushed");
 		}
-
 	}
 
 	public class HandShakeTask extends AsyncTask<Void, Void, Boolean> {
@@ -1500,6 +1503,40 @@ public class StreamingActivity extends Activity implements LocationListener,
 	        }
 	    }
 	    return yuv;
+	}
+
+	@Override
+	public boolean onDown(MotionEvent arg0) {
+		Log.d("GEST", "onDown");
+		return true;
+	}
+
+	@Override
+	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+		Log.d("GEST", "onFling: " + String.valueOf(velocityX) + ", " + String.valueOf(velocityY));
+		return true;
+	}
+
+	@Override
+	public void onLongPress(MotionEvent e) {
+		Log.d("GEST", "onLongPress");
+	}
+
+	@Override
+	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		Log.d("GEST", "onScroll: " + String.valueOf(distanceX) + ", " + String.valueOf(distanceY));
+		return true;
+	}
+
+	@Override
+	public void onShowPress(MotionEvent e) {
+		Log.d("GEST", "onShowPress");
+	}
+
+	@Override
+	public boolean onSingleTapUp(MotionEvent e) {
+		Log.d("GEST", "onSingleTapUp");
+		return true;
 	}
 
 }
