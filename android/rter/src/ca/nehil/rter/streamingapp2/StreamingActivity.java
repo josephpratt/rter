@@ -459,7 +459,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 	
 	public void redrawWebView() {
 		if(overlay==null) return;
-		String url; //for calling javascript...
+		String url = "javascript:"; //for calling javascript...
 		
 		//int camAngle = 60; //GNex
 		int camAngle = 80; //glass
@@ -467,11 +467,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 		//Log.i("jeffbl", "webview redraw: " + String.valueOf(oldHeading) + " ==> " + String.valueOf(newHeading) + " dif: " + Math.abs(oldHeading - overlay.currentOrientation));
 		//Log.i("jeffbl", "java compass: " + String.valueOf(newHeading));
 
-		mWebView.loadUrl("javascript:clearCanvas();");
-		Log.d("JS", "javascript:clearCanvas();");
-		
-		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
-		Log.d("JS", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
+		url += "clearCanvas();";
+		url += "updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");";
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		
 		Location userLoc = new Location("user");		
@@ -489,24 +486,20 @@ public class StreamingActivity extends Activity implements LocationListener,
 				color += "ff"; // make it brighter if the "selected" one
 			else
 				color += "88"; //leave it semi-transparent
-			url = "javascript:updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\");";
-			Log.d("JS", url);
-			mWebView.loadUrl(url);
-			//Log.i("jeffbl", url);
+			url += "updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\");";
 			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < camAngle) {
 				// needs bearingToPoi, distance, remoteBearing, color
-				url = "javascript:drawPoi("
+				url += "drawPoi("
 						+ String.valueOf(pois[i].relativeBearingTo(userLoc)) + ","
 						+ String.valueOf(pois[i].distanceTo(userLoc)) + ","
 						+ String.valueOf(pois[i].remoteBearing) + ",\""
 						+ color + "\","
 						+ String.valueOf(pois[i].poiId)
-						+ ")";
-				mWebView.loadUrl(url);
-				Log.d("JS", url);
-				//Log.i("jeffbl", url);
+						+ ");";
 			}
 		}
+		mWebView.loadUrl(url);
+		Log.d("JS", url);
 	}
 	
 	private Camera openCamera() {
