@@ -94,6 +94,7 @@ public class IndicatorFrame {
 
 	// Render the shape
 	public void draw(GL10 gl) {
+		if(true)return; //jeffblremovearrows
 		// Enable vertex-array and define its buffer
 		gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
 		gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);

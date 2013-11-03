@@ -342,6 +342,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			  }
 			});
 		mWebView.getSettings().setJavaScriptEnabled(true);
+		mWebView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
 		mWebView.addJavascriptInterface(new JSInterface(this), "Android");
 		//mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); //adding software
 		LinearLayout.LayoutParams layoutParamWeb = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -780,7 +781,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 				String url = "javascript:refreshImage("+ String.valueOf(pois[i].poiId) + ");";
 				Log.d("JS", url);
 				mWebView.loadUrl(url);
-				Log.i("jeffbl", url);
+				//Log.i("jeffbl", url);
 			}
 		} catch(JSONException e) {
 			e.printStackTrace();

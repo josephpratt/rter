@@ -132,6 +132,7 @@ public class CameraGLRenderer implements Renderer {
 
 	// Call back to draw the current frame.
 	public void onDrawFrame(GL10 gl) {
+		if(true)return; //jeffblremovearrows
 		// Clear color and depth buffers using clear-value set earlier
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
