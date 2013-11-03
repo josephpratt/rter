@@ -44,7 +44,6 @@
     <!-- Default servers. -->
     <string-array name="servers">
         <item name="server_1">http://10.18.14.64</item>
-        <item name="server_2">http://132.206.74.103:8000</item>
     </string-array>
 
 </resources>
