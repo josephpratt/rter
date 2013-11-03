@@ -463,9 +463,11 @@ public class StreamingActivity extends Activity implements LocationListener,
 		//Log.i("jeffbl", "webview redraw: " + String.valueOf(oldHeading) + " ==> " + String.valueOf(newHeading) + " dif: " + Math.abs(oldHeading - overlay.currentOrientation));
 		//Log.i("jeffbl", "java compass: " + String.valueOf(newHeading));
 
-		mWebView.loadUrl("javascript:clearCanvas()");
+		mWebView.loadUrl("javascript:clearCanvas();");
+		Log.d("JS", "javascript:clearCanvas();");
 		
-		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
+		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
+		Log.d("JS", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		
 		Location userLoc = new Location("user");		
@@ -483,7 +485,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 				color += "ff"; // make it brighter if the "selected" one
 			else
 				color += "88"; //leave it semi-transparent
-			url = "javascript:updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\")";
+			url = "javascript:updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\");";
+			Log.d("JS", url);
 			mWebView.loadUrl(url);
 			//Log.i("jeffbl", url);
 			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < camAngle) {
@@ -492,10 +495,11 @@ public class StreamingActivity extends Activity implements LocationListener,
 						+ String.valueOf(pois[i].relativeBearingTo(userLoc)) + ","
 						+ String.valueOf(pois[i].distanceTo(userLoc)) + ","
 						+ String.valueOf(pois[i].remoteBearing) + ",\""
-						+ color + ",\""
+						+ color + "\","
 						+ String.valueOf(pois[i].poiId)
 						+ ")";
 				mWebView.loadUrl(url);
+				Log.d("JS", url);
 				//Log.i("jeffbl", url);
 			}
 		}
@@ -773,7 +777,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 			}
 			pois = poilist.toArray(pois);
 			for(int i = 0; i < pois.length; i++) {
-				String url = "javascript:refreshImage("+ String.valueOf(pois[i].poiId) + ")";
+				String url = "javascript:refreshImage("+ String.valueOf(pois[i].poiId) + ");";
+				Log.d("JS", url);
 				mWebView.loadUrl(url);
 				Log.i("jeffbl", url);
 			}
