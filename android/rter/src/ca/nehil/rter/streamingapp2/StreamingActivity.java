@@ -243,8 +243,6 @@ public class StreamingActivity extends Activity implements LocationListener,
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
-	// gets called when device orientatiion gotNewImage() {
-	console.info("got new image");on is changed
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 	    super.onConfigurationChanged(newConfig);
@@ -496,7 +494,6 @@ public class StreamingActivity extends Activity implements LocationListener,
 						+ String.valueOf(pois[i].remoteBearing) + ",\""
 						+ color + ",\""
 						+ String.valueOf(pois[i].poiId)
-						+ "\""
 						+ ")";
 				mWebView.loadUrl(url);
 				//Log.i("jeffbl", url);
