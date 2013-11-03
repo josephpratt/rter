@@ -117,11 +117,11 @@ func scanItem(item *data.Item, rows *sql.Rows) error {
 			if thumbnailID > 1 {
 				item.ThumbnailURI = fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID - 1)
 			}
+			resp.Body.Close()
 			break
 		}
 		resp.Body.Close()
 	}
-	
 
 	return nil
 }
