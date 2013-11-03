@@ -781,9 +781,11 @@ public class StreamingActivity extends Activity implements LocationListener,
 				JSONObject item = items.getJSONObject(i);
 				try {
 					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"), item.getString("Type"));
+					/*
 					if(userLoc.distanceTo(poi.loc) < 300.0) {
 						poilist.add(poi);
 					}
+					*/
 				}
 				catch (JSONException e) {
 					//skip item
