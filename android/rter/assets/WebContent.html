@@ -80,7 +80,8 @@
             }
                         
             function drawPoi(bearingToPoi, distance, remoteBearing, color, poiId) {
-            	if(0)ctx.save();
+            	var img = imgCache[poiId];
+            	
             	var left = (c.width/2) + (bearingToPoi/camAngle)*c.width;
             	var width = (c.width - (distance*c.width));
             	if(width < 30) {
@@ -92,9 +93,9 @@
             	if(0) console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
             	
             	if(imgCache[poiId] != null) {
-	            	if(1)ctx.drawImage(imgCache[poiId], left, top);
+	            	if(1)ctx.drawImage(img, left, top);
 	                ctx.strokeStyle = color;
-	            	ctx.rect(left, top, imgCache[poiId].width, imgCache[poiId].height);
+	            	ctx.rect(left, top, img.width, img.height);
 		            ctx.stroke();
 	            }
             	else {
@@ -103,10 +104,24 @@
             		ctx.fillRect(left,top,width,height);
             	}
             	
-            	if(0)ctx.restore();
+            	ctx.save();
+                ctx.translate(left+img.width/2, top+img.height/2);
+                drawBearing(bearingToPoi+remoteBearing, img.height/3, color);
+                ctx.restore();
             }
             
-			function updateCompass(heading, color) {            					
+            function drawBearing(heading, length, color) {
+                ctx.rotate(deg2rad(-(heading-180)));
+                ctx.beginPath();
+                ctx.moveTo(0,0);
+                ctx.lineTo(0,length);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3;
+                ctx.closePath();
+                ctx.stroke();
+            }
+            
+			function updateCompass(heading, color) {
 				if(0)console.info("js updateCompass: " + heading.toString());
 				
                 var compassSize = 0.15*c.width;
@@ -117,15 +132,8 @@
                 ctx.translate(c.width-compassSize, 0);
                 if(1){ctx.translate(-0.03*c.width, 0.03*c.height);}
                 ctx.translate(compassSize/2, compassSize/2);
-                ctx.rotate(deg2rad(-(heading-180)));
-                ctx.beginPath();
-                ctx.moveTo(0,0);
-                ctx.lineTo(0,compassSize/2);
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 3;
-                ctx.closePath();
-                ctx.stroke();
-                ctx.restore();                
+                drawBearing(heading, compassSize/2, color);
+                ctx.restore();
             }
                         
     		function sendDataToAndroid(data) {
