@@ -486,10 +486,12 @@ public class StreamingActivity extends Activity implements LocationListener,
 		
 		for (int i=0; i<pois.length; i++) {
 			String color = pois[i].color;
-			if (i==mostInFront)
+			/*
+			 if (i==mostInFront)
 				color += "ff"; // make it brighter if the "selected" one
 			else
 				color += "88"; //leave it semi-transparent
+			*/
 			url = "javascript:updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\");";
 			Log.d("JS", url);
 			mWebView.loadUrl(url);
@@ -773,7 +775,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			for(int i = 0; i < items.length(); i++) {
 				JSONObject item = items.getJSONObject(i);
 				try {
-					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), "#ff0000", item.getString("ThumbnailURI"));
+					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"));
 					poilist.add(poi);
 				}
 				catch (JSONException e) {
