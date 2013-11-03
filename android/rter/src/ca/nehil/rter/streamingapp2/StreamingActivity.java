@@ -158,8 +158,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 	
 	private POI[] pois;
 
-	private float lati;
-	private float longi;
+	private float lati= 39.050439f;
+	private float longi = -94.607237f;
 
 	private LocationManager locationManager;
 	private String provider;
@@ -349,6 +349,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			});
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+		//mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 		mWebView.addJavascriptInterface(new JSInterface(this), "Android");
 		//mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); //adding software
 		LinearLayout.LayoutParams layoutParamWeb = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -478,7 +479,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		url += "clearCanvas();";
 		url += "updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");";
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
-				
+		
 		if(kc_demo) {
 			userLoc.setLatitude(39.050402);
 			userLoc.setLongitude(-94.607069);
@@ -738,8 +739,10 @@ public class StreamingActivity extends Activity implements LocationListener,
 						Toast.LENGTH_LONG);
 				toast.setGravity(Gravity.TOP, 0, 0);
 				toast.show();
-				lati = (float) (45.505958f);
-				longi = (float) (-73.576254f);
+				//lati = (float) (45.505958f);
+				//longi = (float) (-73.576254f);
+				lati = 39.050439f;
+				longi = -94.607237f;
 				Log.d(TAG, "Location not available");
 			}
 		}
@@ -781,11 +784,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 				JSONObject item = items.getJSONObject(i);
 				try {
 					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"), item.getString("Type"));
-					/*
-					if(userLoc.distanceTo(poi.loc) < 300.0) {
-						poilist.add(poi);
-					}
-					*/
+					poilist.add(poi);
 				}
 				catch (JSONException e) {
 					//skip item
@@ -954,8 +953,11 @@ public class StreamingActivity extends Activity implements LocationListener,
 	public void onLocationChanged(Location location) {
 		// TODO Auto-generated method stub
 
-		lati = (float) (location.getLatitude());
-		longi = (float) (location.getLongitude());
+		//lati = (float) (location.getLatitude());
+		//longi = (float) (location.getLongitude());
+		lati = 39.050439f;
+		longi = -94.607237f;
+		
 		Log.d(TAG, "Location Changed with lat" + lati + " and lng" + longi);
 		// frameInfo.lat = convertfloatToByteArray(lati);
 		// frameInfo.lon = convertStringToByteArray(longi);
