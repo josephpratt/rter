@@ -510,7 +510,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			}
 		}
 		mWebView.loadUrl(url);
-		Log.d("JS", url);
+		//Log.d("JS", url);
 	}
 	
 	private Camera openCamera() {
