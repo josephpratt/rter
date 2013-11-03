@@ -332,7 +332,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		cameraDevice = openCamera();
 		cameraView = new CameraView(this, cameraDevice);
 		
-		mWebView = new WebView(this); //Alok
+		mWebView = new WebView(this);
 		mWebView.setWebChromeClient(new WebChromeClient() {
 			  public boolean onConsoleMessage(ConsoleMessage cm) {
 			    Log.i("MyApplication", cm.message());/* + " -- From line "
@@ -451,8 +451,9 @@ public class StreamingActivity extends Activity implements LocationListener,
 		public float distanceTo(Location fromLoc) {
 			return fromLoc.distanceTo(loc);
 		}
-		//public float bearing; //bearing relative to north
 	}
+	
+	private String[] colors = new String[] {"#ff0000", "#0000ff", "#ffff00", "#00ffff", "#ffffff"};
 	
 	public void redrawWebView() {
 		if(overlay==null) return;
@@ -465,10 +466,10 @@ public class StreamingActivity extends Activity implements LocationListener,
 		//Log.i("jeffbl", "java compass: " + String.valueOf(newHeading));
 
 		mWebView.loadUrl("javascript:clearCanvas();");
-		Log.d("JS", "javascript:clearCanvas();");
+		//Log.d("JS", "javascript:clearCanvas();");
 		
 		mWebView.loadUrl("javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
-		Log.d("JS", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
+		//Log.d("JS", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");");
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
 		
 		Location userLoc = new Location("user");		
@@ -500,7 +501,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 						+ String.valueOf(pois[i].poiId)
 						+ ")";
 				mWebView.loadUrl(url);
-				Log.d("JS", url);
+				//Log.d("JS", url);
 				//Log.i("jeffbl", url);
 			}
 		}
