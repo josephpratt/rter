@@ -243,7 +243,8 @@ public class StreamingActivity extends Activity implements LocationListener,
 		Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 	}
 
-	// gets called when device orientation is changed
+	// gets called when device orientatiion gotNewImage() {
+	console.info("got new image");on is changed
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 	    super.onConfigurationChanged(newConfig);
@@ -768,15 +769,17 @@ public class StreamingActivity extends Activity implements LocationListener,
 				try {
 					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), "#ff0000");
 					poilist.add(poi);
-					String url = "javascript:refreshImage("+ String.valueOf(item.getInt("ID")) + ")";
-					mWebView.loadUrl(url);
-					Log.i("jeffbl", url);
 				}
 				catch (JSONException e) {
 					//skip item
 				}
 			}
 			pois = poilist.toArray(pois);
+			for(int i = 0; i < pois.length; i++) {
+				String url = "javascript:refreshImage("+ String.valueOf(pois[i].poiId) + ")";
+				mWebView.loadUrl(url);
+				Log.i("jeffbl", url);
+			}
 		} catch(JSONException e) {
 			e.printStackTrace();
 		}
