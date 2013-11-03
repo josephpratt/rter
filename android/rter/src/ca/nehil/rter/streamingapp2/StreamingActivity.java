@@ -111,6 +111,8 @@ import static com.googlecode.javacv.cpp.opencv_core.*;
 public class StreamingActivity extends Activity implements LocationListener,
 		OnClickListener, GestureDetector.OnGestureListener {
 
+	private static final Boolean kc_demo = true;
+	
 	private static String server_url;
 	private SharedPreferences storedValues;
 
@@ -336,7 +338,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		cameraDevice = openCamera();
 		cameraView = new CameraView(this, cameraDevice);
 		
-		mWebView = new WebView(this); //Alok
+		mWebView = new WebView(this);
 		mWebView.setWebChromeClient(new WebChromeClient() {
 			  public boolean onConsoleMessage(ConsoleMessage cm) {
 			    Log.i("MyApplication", cm.message());/* + " -- From line "
@@ -458,8 +460,10 @@ public class StreamingActivity extends Activity implements LocationListener,
 		public float distanceTo(Location fromLoc) {
 			return fromLoc.distanceTo(loc);
 		}
-		//public float bearing; //bearing relative to north
 	}
+	
+	private String[] colors = new String[] {"#ff0000", "#0000ff", "#ffff00", "#00ffff", "#ffffff"};
+	private Location userLoc = new Location("user");
 	
 	public void redrawWebView() {
 		if(overlay==null) return;
@@ -474,10 +478,15 @@ public class StreamingActivity extends Activity implements LocationListener,
 		url += "clearCanvas();";
 		url += "updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");";
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
-		
-		Location userLoc = new Location("user");		
-		userLoc.setLatitude(lati);
-		userLoc.setLongitude(longi);
+				
+		if(kc_demo) {
+			userLoc.setLatitude(39.050439);
+			userLoc.setLongitude(-94.607237);
+		}
+		else {
+			userLoc.setLatitude(lati);
+			userLoc.setLongitude(longi);
+		}
 		
 		int mostInFront=0;
 		for(int i=1; i<pois.length-1; i++) {
@@ -486,10 +495,12 @@ public class StreamingActivity extends Activity implements LocationListener,
 		
 		for (int i=0; i<pois.length; i++) {
 			String color = pois[i].color;
-			if (i==mostInFront)
+			/*
+			 if (i==mostInFront)
 				color += "ff"; // make it brighter if the "selected" one
 			else
 				color += "88"; //leave it semi-transparent
+			*/
 			url += "updateCompass("+ String.valueOf(-pois[i].relativeBearingTo(userLoc)) + ",\"" + pois[i].color + "\");";
 			if (Math.abs(pois[i].relativeBearingTo(userLoc)) < camAngle) {
 				// needs bearingToPoi, distance, remoteBearing, color
@@ -503,7 +514,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			}
 		}
 		mWebView.loadUrl(url);
-		Log.d("JS", url);
+		//Log.d("JS", url);
 	}
 	
 	private Camera openCamera() {
@@ -769,7 +780,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			for(int i = 0; i < items.length(); i++) {
 				JSONObject item = items.getJSONObject(i);
 				try {
-					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), "#ff0000", item.getString("ThumbnailURI"), item.getString("Type"));
+					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"), item.getString("Type"));
 					poilist.add(poi);
 				}
 				catch (JSONException e) {

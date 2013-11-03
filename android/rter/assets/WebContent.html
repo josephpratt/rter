@@ -78,9 +78,9 @@
             	imgCache[imgId].onLoad=gotNewImage();
             	imgCache[imgId].src = imgUrl;
             }
-            
+                        
             function drawPoi(bearingToPoi, distance, remoteBearing, color, poiId) {
-            	ctx.save();
+            	if(0)ctx.save();
             	var left = (c.width/2) + (bearingToPoi/camAngle)*c.width;
             	var width = (c.width - (distance*c.width));
             	if(width < 30) {
@@ -92,14 +92,18 @@
             	if(0) console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
             	
             	if(imgCache[poiId] != null) {
-	            	ctx.drawImage(imgCache[poiId], left, top);
+	            	if(1)ctx.drawImage(imgCache[poiId], left, top);
+	                ctx.strokeStyle = color;
+	            	ctx.rect(left, top, imgCache[poiId].width, imgCache[poiId].height);
+		            ctx.stroke();
 	            }
             	else {
-            		ctx.fillStyle=color;
+	            	ctx.fillStyle=color;
+	            	ctx.lineWidth="3";
             		ctx.fillRect(left,top,width,height);
             	}
             	
-            	ctx.restore();
+            	if(0)ctx.restore();
             }
             
 			function updateCompass(heading, color) {            					
