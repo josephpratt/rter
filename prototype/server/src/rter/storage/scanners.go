@@ -5,7 +5,17 @@ import (
 	"log"
 	"rter/data"
 	"time"
+	"net/http"
+	"fmt"
+	"strconv"
+	"net"
 )
+
+var timeout = time.Duration(10 * time.Millisecond)
+
+func dialTimeout(network, addr string) (net.Conn, error) {
+    return net.DialTimeout(network, addr, timeout)
+}
 
 func scanItemComment(comment *data.ItemComment, rows *sql.Rows) error {
 	var updateTimeString string
@@ -89,6 +99,29 @@ func scanItem(item *data.Item, rows *sql.Rows) error {
 	}
 
 	item.StopTime = stopTime
+
+	transport := http.Transport{
+        Dial: dialTimeout,
+    }
+
+    client := http.Client{
+        Transport: &transport,
+    }
+
+	status := 200
+	thumbnailURI := ""
+	for thumbnailID := 1; status != 404; thumbnailID += 1 {
+		thumbnailURI = fmt.Sprintf(item.ContentURI + "/thumb/%09d.jpg", thumbnailID)
+		log.Println(thumbnailURI)
+		resp, err := client.Get(thumbnailURI)
+		if err != nil {
+			break
+		}
+		status = resp.StatusCode
+		log.Println(thumbnailURI + ": " + strconv.Itoa(status))
+		resp.Body.Close()
+	}
+	item.ThumbnailURI = thumbnailURI
 
 	return nil
 }
