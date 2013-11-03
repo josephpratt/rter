@@ -37,6 +37,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -429,13 +431,14 @@ public class StreamingActivity extends Activity implements LocationListener,
 	
 	//one location from the server
 	class POI {
-		public POI(int _poiId, double _remoteBearing, double _lat, double _lng, String _color) {
+		public POI(int _poiId, double _remoteBearing, double _lat, double _lng, String _color, String _curThumbnailURL) {
 			poiId = _poiId;
 			remoteBearing = _remoteBearing; //orientation of device relative to N
 			loc = new Location("poi");
 			loc.setLatitude(_lat);
 			loc.setLongitude(_lng);
 			color = _color;
+			curThumbnailURL = _curThumbnailURL;
 		}
 		public int poiId;
 		Location loc;
@@ -769,19 +772,26 @@ public class StreamingActivity extends Activity implements LocationListener,
 			for(int i = 0; i < items.length(); i++) {
 				JSONObject item = items.getJSONObject(i);
 				try {
-					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), "#ff0000");
+					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), "#ff0000", item.getString("ThumbnailURI"));
 					poilist.add(poi);
 				}
 				catch (JSONException e) {
 					//skip item
 				}
 			}
+			//POI[] oldpois = new POI[pois.length];
+			Map<Integer, POI> oldpois = new HashMap<Integer, POI>();
+			for (int i = 0; i < pois.length; i++) {
+				oldpois.put(pois[i].poiId, pois[i]);
+			}
+			
 			pois = poilist.toArray(pois);
 			for(int i = 0; i < pois.length; i++) {
-				String url = "javascript:refreshImage("+ String.valueOf(pois[i].poiId) + ");";
-				Log.d("JS", url);
-				mWebView.loadUrl(url);
-				//Log.i("jeffbl", url);
+				if(oldpois.get(pois[i].poiId) == null || !pois[i].curThumbnailURL.equals(oldpois.get(pois[i].poiId).curThumbnailURL)) {
+					Log.i("jeffbl", "Updating thumbnail for Item " + String.valueOf(pois[i].poiId));
+					String url = "javascript:refreshImage("+ String.valueOf(pois[i].poiId) + ", \"" + pois[i].curThumbnailURL + "\");";
+					mWebView.loadUrl(url);
+				}
 			}
 		} catch(JSONException e) {
 			e.printStackTrace();
