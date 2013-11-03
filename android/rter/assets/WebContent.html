@@ -72,12 +72,11 @@
 			}
                         
             var imgCache = new Array();
-            function refreshImage(imgId) {
+            function refreshImage(imgId, imgUrl) {
             	imgCache[imgId] = new Image();
             	console.info(imgId.toString());
             	imgCache[imgId].onLoad=gotNewImage();
-            	var url = "http://rter.zapto.org:8080/v1/videos/230/thumb/000000001.jpg";
-            	imgCache[imgId].src = url;
+            	imgCache[imgId].src = imgUrl;
             }
                         
             function drawPoi(bearingToPoi, distance, remoteBearing, color, poiId) {
