@@ -349,6 +349,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 			});
 		mWebView.getSettings().setJavaScriptEnabled(true);
 		mWebView.getSettings().setRenderPriority(WebSettings.RenderPriority.HIGH);
+		//mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
 		mWebView.addJavascriptInterface(new JSInterface(this), "Android");
 		//mWebView.setLayerType(View.LAYER_TYPE_SOFTWARE, null); //adding software
 		LinearLayout.LayoutParams layoutParamWeb = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
@@ -478,7 +479,7 @@ public class StreamingActivity extends Activity implements LocationListener,
 		url += "clearCanvas();";
 		url += "updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\");";
 		//Log.i("jeffbl", "javascript:updateCompass("+String.valueOf(overlay.currentOrientation)+",\"#00ff00\")");
-				
+		
 		if(kc_demo) {
 			userLoc.setLatitude(39.050402);
 			userLoc.setLongitude(-94.607069);
@@ -781,8 +782,12 @@ public class StreamingActivity extends Activity implements LocationListener,
 				JSONObject item = items.getJSONObject(i);
 				try {
 					POI poi = new POI(item.getInt("ID"), item.getDouble("Heading"), item.getDouble("Lat"), item.getDouble("Lat"), colors[poilist.size()%colors.length], item.getString("ThumbnailURI"), item.getString("Type"));
-					if(userLoc.distanceTo(poi.loc) < 300.0) {
+					if(true || userLoc.distanceTo(poi.loc) < 300.0) {
 						poilist.add(poi);
+						//Log.i("jeffbl", "POI updated");
+					}
+					else {
+						Log.i("jeffbl", "Throwing away a POI since it is too far away.");
 					}
 				}
 				catch (JSONException e) {

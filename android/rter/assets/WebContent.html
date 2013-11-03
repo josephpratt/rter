@@ -68,13 +68,13 @@
 			}
 			
 			function gotNewImage() {
-				if(0) console.info("got new image");
+				if(1) console.info("got new image");
 			}
                         
             var imgCache = new Array();
             function refreshImage(imgId, imgUrl) {
             	imgCache[imgId] = new Image();
-            	console.info(imgId.toString());
+            	console.info("javascript refreshImage: " + imgId.toString());
             	imgCache[imgId].onLoad=gotNewImage();
             	imgCache[imgId].src = imgUrl;
             }
@@ -92,8 +92,8 @@
             	
             	if(0) console.info("rect coords: "+left.toString() + " " + top.toString() + " " + width.toString() + " " + height.toString());
             	
-            	if(imgCache[poiId] != null) {
-	            	if(1)ctx.drawImage(img, left, top);
+            	if(typeof img != "undefined" && img != null) {
+	            	ctx.drawImage(img, left, top);
 	                ctx.strokeStyle = color;
 	            	ctx.rect(left, top, img.width, img.height);
 		            ctx.stroke();
@@ -105,8 +105,14 @@
             	}
             	
             	ctx.save();
-                ctx.translate(left+img.width/2, top+img.height/2);
-                drawBearing(bearingToPoi+remoteBearing, img.height/3, color);
+            	if(typeof img != "undefined" && img != null) {
+                	ctx.translate(left+img.width/2, top+img.height/2);
+                	drawBearing(bearingToPoi+remoteBearing, img.height/3, color);
+                }
+                else {
+                	ctx.translate(left+width/2, top+height/2);
+                	drawBearing(bearingToPoi+remoteBearing, height/3, color);
+                }
                 ctx.restore();
             }
             
