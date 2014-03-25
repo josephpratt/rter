@@ -1,0 +1,54 @@
+<!-- for now, must be closeup-item class for map -->
+<div class="closeup-item" ng-switch on="item.Type">
+    <div ng-switch-when="twitter">
+        <closeup-twitter-item item="item" dialog="dialog"></closeup-twitter-item>
+    </div>
+    <div ng-switch-when="singletweet">      
+        <closeup-singletweet-item item="item" dialog="dialog"></closeup-singletweet-item>
+    </div>
+    <div ng-switch-when="youtube">
+        <closeup-youtube-item item="item" dialog="dialog"></closeup-youtube-item>
+    </div>
+    <div ng-switch-when="raw">
+        <closeup-raw-item item="item" dialog="dialog"></closeup-raw-item>
+    </div>
+    <div ng-switch-when="streaming-video-v1">
+        <closeup-streaming-video-v1-item item="item" dialog="dialog"></closeup-streaming-video-v1-item>
+    </div>
+    <div ng-switch-default>
+        <closeup-generic-item item="item" dialog="dialog"></closeup-generic-item>
+    </div>
+</div>
+
+<hr>
+
+<div class="row-fluid">
+    <div class="span5">
+        <label for="Tags">Tags</label>
+        
+    </div>
+    <div class="span7">
+        <label>Comments</label>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span5">
+        <form name="closeupTagForm">
+            <div class="row-fluid">
+                <div class="span10">
+                    <tag-selector terms="item.Terms"></tag-selector>
+                    <!-- <tag-list terms="item.Terms"></tag-list> -->
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="span7">
+        <comments-dialog item-id="item.ID"></comments-dialog>
+    </div>
+</div>
+
+<div class="float-control-right" ng-hide="!dialog">
+    <button class="btn btn-danger" ng-click="cancel()" ng-hide="!dialog">Close</button>
+</div>
+

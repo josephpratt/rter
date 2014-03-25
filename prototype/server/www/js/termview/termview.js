@@ -3,7 +3,8 @@ angular.module('termview', [
 	'ui',       //ui-sortable and map
 	'items',    //ItemCache to load items into termview, various itemDialog services
 	'taxonomy', //Rankings
-	'alerts'    //Alerter
+	'alerts',    //Alerter
+	'timeline'
 ])
 
 .factory('TermViewRemote', function () {
@@ -41,6 +42,7 @@ angular.module('termview', [
 })
 
 .controller('TermViewCtrl', function($scope, $filter, $timeout, Alerter, ItemCache, UpdateItemDialog, CloseupItemDialog, TermViewRemote, TaxonomyRankingCache) {
+	$scope.isCollapsed = true;
 
 	$scope.viewmode = "grid-view";
 	$scope.filterMode = "blur";
@@ -51,7 +53,7 @@ angular.module('termview', [
 	});
 
 	$scope.$watch('viewmode', function(newVal, oldVal) {
-		$scope.mapCenter = $scope.map.getCenter();
+		// $scope.mapCenter = $scope.map.getCenter();
 
 		$timeout(function() {
 			$scope.resizeMap();
@@ -193,7 +195,7 @@ angular.module('termview', [
 	/* -- Map -- */
 
 	$scope.boundsChanged = function() {
-		$scope.mapBounds = $scope.map.getBounds();
+		// $scope.mapBounds = $scope.map.getBounds();
 	};
 
 	$scope.markerBundles = [];
@@ -207,9 +209,9 @@ angular.module('termview', [
 	};
 
 	$scope.resizeMap = function() {
-		google.maps.event.trigger($scope.map, "resize");
-		$scope.map.setCenter($scope.mapCenter);
-		$scope.mapBounds = $scope.map.getBounds();
+		// google.maps.event.trigger($scope.map, "resize");
+		// $scope.map.setCenter($scope.mapCenter);
+		// $scope.mapBounds = $scope.map.getBounds();
 	};
 
 	$scope.updateMarkers = function() {
@@ -237,7 +239,7 @@ angular.module('termview', [
 
 	$scope.centerAt = function(location) {
 		var latlng = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
-		$scope.map.setCenter(latlng);
+		// $scope.map.setCenter(latlng);
 		$scope.mapCenter = latlng;
 	};
 })
@@ -255,4 +257,3 @@ angular.module('termview', [
 		}
 	};
 });
-

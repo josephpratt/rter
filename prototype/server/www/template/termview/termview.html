@@ -6,21 +6,32 @@
 			    <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'grid-view'">Grid</button>
 			    <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'list-view'">List</button>
 			    <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'map-view'">Map</button>
+			    <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'timeline-view'">Timeline</button>
 			</div>
 		</div>
 		<div class="span6">
-			<b>Filtering:</b>
-			<div class="btn-group" data-toggle="buttons-checkbox">
-			    <button type="button" class="btn btn-primary" ng-model="filterMode" btn-radio="'blur'">Blur</button>
-			    <button type="button" class="btn btn-primary" ng-model="filterMode" btn-radio="'remove'">Remove</button>
-			</div>
+			<!-- <div ng-show="viewmode === 'timeline-view'">
+				<b>Filtering:</b>
+				<button type="button" class="btn btn-primary" ng-click="isCollapsed = !isCollapsed">Advanced Filtering</button>
+			</div> -->
+			<!-- <div ng-show="viewmode !== 'timeline-view'"> -->
+				<b>Filtering:</b>
+				<div class="btn-group" data-toggle="buttons-checkbox">
+					<button type="button" class="btn btn-primary" ng-model="filterMode" btn-radio="'blur'">Blur</button>
+			   		<button type="button" class="btn btn-primary" ng-model="filterMode" btn-radio="'remove'">Remove</button>
+				</div>
+			<!-- </div> -->
 		</div>
 		<div class="span2 right-align">
 			<button class="btn btn-danger" ng-click="close()">Close View</button>
 		</div>
 	</div>
 	
-	<div class="{{viewmode}}">
+	<!-- <div class="{{viewmode}}" ng-switch on="viewmode"> -->
+    <div class="{{viewmode}}">
+		<!-- <div ng-switch-when="timeline-view">
+			<timeline term="term" is-collapsed="isCollapsed"></timeline>
+		</div> -->
 		<div class="row-fluid">
 			<div class="left span8">
 				<div class="nodrag-warn" ng-hide="term.Term.length">You cannot drag and drop in the "Live Feed" view. Please use the "+" to open another workspace.</div>
@@ -47,7 +58,6 @@
 					</header>
 					<input type="text" class="search-query" name="textQuery" ng-model="textQuery" placeholder="Search">
 				</div>
-
 				<div class="filter filter-map">
 					<header>
 						<label for="mapFitlerEnable">Map Filter</label>

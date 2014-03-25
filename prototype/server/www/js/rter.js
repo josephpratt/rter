@@ -66,6 +66,7 @@ angular.module('rter', [
 	}, true);
 
 	$scope.addTermView = function(term) {
+		console.log(term);
 		TermViewRemote.addTermView(term);
 	};
 

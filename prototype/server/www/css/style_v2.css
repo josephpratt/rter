@@ -351,6 +351,10 @@ label {
 	width: 20px;
 }
 
+.timeline-tags .select2-container{
+	width: 100%;
+}
+
 .error {
 	color: red;
 }

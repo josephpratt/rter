@@ -23,7 +23,7 @@ angular.module('taxonomy', [
 
 		this.term = term;
 		this.ranking = [];
-		this.stream = new SockJS('/1.0/streaming/taxonomy/'+term+'/ranking');
+		this.stream = new SockJS('/1.0/streaming/taxonomy/' + term + '/ranking');
 
 		function parseTermRanking(termRanking) {
 			if(termRanking.Ranking === "" || termRanking.Ranking === undefined) {
@@ -146,7 +146,7 @@ angular.module('taxonomy', [
 	if($scope.terms !== undefined) {
 		var concat = "";
 		for(var i = 0;i < $scope.terms.length;i++) {
-			concat += $scope.terms[i].Term+",";
+			concat += $scope.terms[i].Term + ",";
 		}
 		$scope.terms = concat.substring(0, concat.length-1);
 	}
@@ -170,12 +170,13 @@ angular.module('taxonomy', [
 			return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
 		},
 		initSelection: function (element, callback) {
+			// console.log('hi');
 			var data = [];
 			$(element.val().split(",")).each(function (v, a) {
 				data.push({Term: a});
 			});
 			callback(data);
-		}
+		},
 	};
 })
 

@@ -12,9 +12,12 @@
 	<link href="/vendor/angular/bootstrap.css" rel="stylesheet">
 	<link href="/vendor/tsunami-0.1.1.min.css" rel="stylesheet">
 
+    <link rel="stylesheet" type="text/css" href="vendor/timeline/timeline.css">
+
 	<link rel="stylesheet" type="text/css" href="/css/style_v2.css">
 
 	<!-- VENDOR JS -->
+  
 
 	<script src="/vendor/jquery/jquery.js"></script>
 
@@ -23,11 +26,14 @@
 	<script src="/vendor/select2/select2.js"></script>
 
 	<script src="/vendor/angular/angular.js"></script>
+
 	<script src="/vendor/angular/angular-resource.js"></script>
 	<script src="/vendor/angular/angular-cookies.js"></script>
 
 	<script src="/vendor/angular/angular-ui.js"></script>
-	<script src="https://raw.github.com/angular-ui/angular-ui/master/modules/directives/sortable/sortable.js"></script>
+
+	<!--<script type="text/javascript" src="https://raw.github.com/angular-ui/angular-ui/master/modules/directives/sortable/sortable.js"></script> -->
+	<script src="/vendor/sortable/sortable.js"></script>
 
 	<script src="/vendor/angular/ui-bootstrap-tpls.js"></script>
 
@@ -38,6 +44,12 @@
 	<script src="/vendor/moment.js"></script>
 
 	<script src="/vendor/angular/angular-http-auth.js"></script>
+
+	<!-- Timeline -->
+	<script src="/vendor/timeline/timeline.js"></script>
+	<script src="/vendor/angular/slider.js"></script>
+	<!-- <script src="/vendor/d3/d3.js"></script>
+    <script src="/vendor/angular-charts/angular-charts.js"></script>-->
 
 	<!-- App JS -->
 
@@ -67,6 +79,8 @@
 	<script type="text/javascript" src="/js/taxonomy/taxonomy.js"></script>
 
 	<script type="text/javascript" src="/js/comments/comments.js"></script>
+
+	<script type="text/javascript" src="/js/timeline/timeline.js"></script>
 
 	<script type="text/javascript" src="/js/termview/termview.js"></script>
 
@@ -105,12 +119,18 @@
 				<tag-cloud></tag-cloud>
  			</pane>
 
-			<pane ng-repeat="view in termViews" heading="{{view.heading}}" active="view.active">
+			<pane ng-repeat="view in termViews" heading="{{view.heading}}">
 				<termview term="view.term">
 				</termview>
 			</pane>
+
+			<pane ng-repeat="view in termViews" heading="Timeline"  active="view.active">
+				<timeline term="view.term"></timeline>
+			</pane>
 		</tabs>
+
 	</div>
+
 
 </body>
 </html>

@@ -43,14 +43,82 @@ angular.module('items', [
 	);
 })
 
+.filter('filterByType', function() {
+	return function (input, typesToDisplay) {
+		var out = [];
+		for (var i = 0; i < input.length; i++) {
+			switch (input[i].Type) {
+				case "youtube":
+					if (typesToDisplay.youtube) {
+						out.push(input[i]);
+					}
+					break;
+				case "twitter":
+					if (typesToDisplay.twitter) {
+						out.push(input[i]);
+					}
+					break;
+				case "generic":
+					if (typesToDisplay.generic) {
+						out.push(input[i]);
+					}
+					break;
+				case "raw":
+					if (typesToDisplay.raw) {
+						out.push(input[i]);
+					}
+					break;
+			}
+		}
+		return out;
+	}
+})
+
+.filter('filterByTime', function() {
+	return function (input, startTime, stopTime) {
+		var out = [];
+		for (var i = 0; i < input.length; i++) {
+			// Changed to check StartTime only so that it includes ranged (raw items)
+			if (input[i].StartTime >= startTime && input[i].StartTime <= stopTime) {
+				out.push(input[i]);
+			}
+		}
+		return out;
+	};
+})
+
+.filter('filterByTag', function() {
+	return function (input, tagsArray) {
+		if (tagsArray === undefined) return input;
+		var out = [];
+		var breakToNextInput = false;
+		for (var i = 0; i < input.length; i++) {
+			for (var j = 0; j < input[i].Terms.length; j++) {
+				for (var k = 0; k < tagsArray.length; k++) {
+					if (input[i].Terms[j].Term === tagsArray[k].Term) {
+						out.push(input[i]);
+						breakToNextInput = true;
+						break;
+					}
+				}
+				if (breakToNextInput) {
+					breakToNextInput = false;
+					break;
+				}
+			}
+		}
+		return out;
+	}
+})
+
 .filter('filterbyBounds', function() {
-	return function(input, bounds) {
+	return function (input, bounds) {
 		out = [];
-		for(var i = 0;i < input.length;i++) {
-			if(input[i].Lat !== undefined && input[i].Lng !== undefined && bounds !== undefined) {
-				if(input[i].Lat < Math.min(bounds.getNorthEast().lat(), bounds.getSouthWest().lat()) || input[i].Lat > Math.max(bounds.getNorthEast().lat(), bounds.getSouthWest().lat())) {
+		for (var i = 0;i < input.length;i++) {
+			if (input[i].Lat !== undefined && input[i].Lng !== undefined && bounds !== undefined) {
+				if (input[i].Lat < Math.min(bounds.getNorthEast().lat(), bounds.getSouthWest().lat()) || input[i].Lat > Math.max(bounds.getNorthEast().lat(), bounds.getSouthWest().lat())) {
 					//Outside via lat
-				} else if(input[i].Lng < Math.min(bounds.getNorthEast().lng(), bounds.getSouthWest().lng()) || input[i].Lng > Math.max(bounds.getNorthEast().lng(), bounds.getSouthWest().lng())) {
+				} else if (input[i].Lng < Math.min(bounds.getNorthEast().lng(), bounds.getSouthWest().lng()) || input[i].Lng > Math.max(bounds.getNorthEast().lng(), bounds.getSouthWest().lng())) {
 					//Outside via lng
 				} else {
 					out.push(input[i]);
@@ -63,7 +131,7 @@ angular.module('items', [
 })
 
 .filter('orderByRanking', function() { //FIXME: this is n^2 probably not good
-	return function(input, ranking) {
+	return function (input, ranking) {
 		if(ranking === undefined || ranking.length === 0) return input;
 
 		var out = [];
@@ -71,7 +139,7 @@ angular.module('items', [
 
 		for(var i = 0;i < input.length;i++) {
 			var found = false;
-			for(var j = 0;j < ranking.length;j++) {
+			for(var j = 0; j < ranking.length; j++) {
 				if(input[i].ID == ranking[j] && out[j] === undefined) {
 					found = true;
 					out[j] = input[i];
@@ -97,7 +165,7 @@ angular.module('items', [
 })
 
 .filter('filterByTerm', function() {
-	return function(input, term) {
+	return function (input, term) {
 		if(term === "" || term === undefined) return input;
 		var out = [];
 		for(var i = 0;i < input.length;i++) {
@@ -318,4 +386,49 @@ angular.module('items', [
 			return d.open();
 		}
 	};
+})
+
+.controller('ViewonlyItemCtrl', function($scope, ItemCache) {
+	$scope.cancel = function() {
+		if($scope.dialog !== undefined) {
+			$scope.dialog.close();
+		}
+	};
+})
+
+.directive('viewonlyItem', function() {
+    return {
+        restrict: 'E',
+        scope: {
+            item: "=",
+            dialog: "="
+        },
+        templateUrl: '/template/items/viewonly-item.html',
+        controller: 'ViewonlyItemCtrl',
+        link: function(scope, element, attrs) {
+
+        }
+    };
+})
+
+.controller('ViewonlyItemDialogCtrl', function($scope, item, dialog) {
+    $scope.dialog = dialog;
+    $scope.item = item;
+})
+
+.factory('ViewonlyItemDialog', function ($dialog) {
+    return {
+        open: function(item) {
+            var d = $dialog.dialog({
+                modalFade: false,
+                backdrop: false,
+                keyboard: true,
+                backdropClick: false,
+                resolve: {item: function() { return item; }},
+                templateUrl: '/template/items/viewonly-item-dialog.html',
+                controller: 'ViewonlyItemDialogCtrl'
+            });
+            return d.open();
+        }
+    };
 });
