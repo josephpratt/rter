@@ -401,13 +401,17 @@ angular.module('timeline', [
                 $scope.timelineStopTime = $scope.timeline.maxTime;
             }
         }
-        $scope.sliderStartVal = $scope.timelineStartTime.getHours();
-        $scope.sliderStartMinVal = $scope.timelineStartTime.getMinutes();
-        $scope.sliderStopVal = $scope.timelineStopTime.getHours();
-        $scope.sliderStopMinVal = $scope.timelineStopTime.getMinutes();
 
-        $scope.startDateString = getDateString($scope.timelineStartTime);
-        $scope.stopDateString = getDateString($scope.timelineStopTime);
+        if ($scope.timelineStartTime && $scope.timelineStopTime) {
+            $scope.sliderStartVal = $scope.timelineStartTime.getHours();
+            $scope.sliderStartMinVal = $scope.timelineStartTime.getMinutes();
+            $scope.sliderStopVal = $scope.timelineStopTime.getHours();
+            $scope.sliderStopMinVal = $scope.timelineStopTime.getMinutes();
+            $scope.startDateString = getDateString($scope.timelineStartTime);
+            $scope.stopDateString = getDateString($scope.timelineStopTime);
+        }
+
+        
     }, true);
 
     $scope.$watch('tags', function () {
@@ -420,13 +424,15 @@ angular.module('timeline', [
     }, true);
 
     $scope.$watch('[timelineStartTime, timelineStopTime, generic, youtube, twitter, raw]', function () {
-        $scope.sliderStartVal = $scope.timelineStartTime.getHours();
-        $scope.sliderStartMinVal = $scope.timelineStartTime.getMinutes();
-        $scope.sliderStopVal = $scope.timelineStopTime.getHours();
-        $scope.sliderStopMinVal = $scope.timelineStopTime.getMinutes();
+        if ($scope.timelineStartTime && $scope.timelineStopTime) {
+            $scope.sliderStartVal = $scope.timelineStartTime.getHours();
+            $scope.sliderStartMinVal = $scope.timelineStartTime.getMinutes();
+            $scope.sliderStopVal = $scope.timelineStopTime.getHours();
+            $scope.sliderStopMinVal = $scope.timelineStopTime.getMinutes();
 
-        $scope.startDateString = getDateString($scope.timelineStartTime);
-        $scope.stopDateString = getDateString($scope.timelineStopTime);
+            $scope.startDateString = getDateString($scope.timelineStartTime);
+            $scope.stopDateString = getDateString($scope.timelineStopTime);
+        }
 
         $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
         $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
@@ -438,28 +444,29 @@ angular.module('timeline', [
 
     //Slider for Hour control for Start Time
     $scope.$watch('[sliderStartVal]', function() {
-        if ($scope.timelineStartTime.getHours() !== $scope.sliderStartVal) {
+        if ($scope.timelineStartTime) {
             $scope.timelineStartTime.setHours($scope.sliderStartVal);   
         }
     }, true);
     
     //Slider for Minute Control for Start Time
     $scope.$watch('[sliderStartMinVal]', function() {
-        if ($scope.timelineStartTime.getMinutes() !== $scope.sliderStartMinVal) {
+        if ($scope.timelineStartTime) {
             $scope.timelineStartTime.setMinutes($scope.sliderStartMinVal);  
         }
     }, true);
 
     //for stop slider
     $scope.$watch('[sliderStopVal]', function() {
-        if ($scope.timelineStopTime.getHours() !== $scope.sliderStopVal) {
+        if ($scope.timelineStopTime) {
             $scope.timelineStopTime.setHours($scope.sliderStopVal); 
         }
     }, true);
 
     //Slider for Minute Control for Stop Time
     $scope.$watch('[sliderStopMinVal]', function() {
-        if ($scope.timelineStopTime.getMinutes() !== $scope.sliderStopMinVal) {
+        // Why are we checking this?
+        if ($scope.timelineStopTime) {
             $scope.timelineStopTime.setMinutes($scope.sliderStopMinVal);    
         }
     }, true);
@@ -542,133 +549,3 @@ angular.module('timeline', [
 //         }
 //     };
 // });
-
-// tldr
-/* BEGIN ANGULAR CHARTS */
-    // $scope.getDayCount = function (date1, date2) {
-    //      // The number of milliseconds in one day
-    //     var ONE_DAY = 1000 * 60 * 60 * 24;
-
-    //     // Convert both dates to milliseconds
-    //     var date1_ms = date1.getTime();
-    //     var date2_ms = date2.getTime();
-
-    //     // Calculate the difference in milliseconds
-    //     var difference_ms = Math.abs(date1_ms - date2_ms);
-        
-    //     // Convert back to days and return
-    //     return Math.round(difference_ms/ONE_DAY);
-    //     // return Math.floor(difference_ms/ONE_DAY);
-    // };
-
-    // $scope.makeLabel = function (date) {
-    //     var CURRENT_LOCALE = "en-US";
-    //     // var label = {
-    //     return {
-    //         year: date.toLocaleDateString(CURRENT_LOCALE, {year: "numeric"}),
-    //         month: date.toLocaleDateString(CURRENT_LOCALE, {month: "2-digit"}),
-    //         day: date.toLocaleDateString(CURRENT_LOCALE, {day: "2-digit"}),
-    //         hour: date.toLocaleDateString(CURRENT_LOCALE, {hour: "2-digit"}),
-    //         minute: date.toLocaleDateString(CURRENT_LOCALE, {minute: "2-digit"}),
-    //         second: date.toLocaleDateString(CURRENT_LOCALE, {second: "2-digit"})
-    //     };
-    // };
-
-    // $scope.onlyGetThisType = function(type) {
-    //     var byType = $filter('filterByType')($scope.items, type);
-    // }
-
-    // $scope.makeData = function (beginDate, endDate) {
-    //     var data = [];
-
-    //     var ONE_DAY = 999 * 60 * 60 * 24;
-    //     // For now, start the search at the beginning of the beginDate day until the end of the endDate day
-    //     var beginLabel = $scope.makeLabel(beginDate);
-    //     var endLabel = $scope.makeLabel(endDate);
-    //     beginDate = new Date(beginLabel.year, beginLabel.month - 1, beginLabel.day);
-    //     endDate = new Date(endLabel.year, endLabel.month - 1, endLabel.day);
-    //     endDate = new Date(endDate.getTime() + ONE_DAY);
-        
-    //     var currentDate = beginDate;
-    //     var dayCount = $scope.getDayCount(currentDate, endDate);
-    //     for (var i = 0; i <= dayCount; i++) {
-    //         // Only get the items from the start of the current day to the end of the current day
-    //         var filterByTime = $filter('filterByTime')($scope.items, currentDate, new Date(currentDate.getTime() + ONE_DAY));
-    //         console.log(filterByTime);
-    //         var itemsByType = $filter('getCountByType')(filterByTime);
-    //         console.log(itemsByType);
-    //         var label = $scope.makeLabel(currentDate);
-    //         var labelString = label.year + "/" + label.month + "/" + label.day;
-    //         var yData = [];
-    //         if ($scope.generic) {
-    //             yData.push(itemsByType.generic);
-    //         }
-    //         if ($scope.youtube) {
-    //             yData.push(itemsByType.youtube);
-    //         }
-    //         if ($scope.twitter) {
-    //             yData.push(itemsByType.twitter);
-    //         }
-    //         if ($scope.raw) {
-    //             yData.push(itemsByType.raw);
-    //         }
-    //         data.push({
-    //             x: labelString,
-    //             y: yData
-    //         });
-    //         currentDate = new Date(currentDate.getTime() + ONE_DAY);
-    //     }
-    //     return data;
-    // };
-
-    // $scope.chartData = {
-    //     series: ['Generic', 'Youtube', 'Twitter', 'Raw'],
-    //     data : $scope.makeData($scope.timelineStartTime, $scope.timelineStopTime)
-    // }
-
-    // $scope.chartType = 'bar';
-
-    // $scope.config = {
-    //     labels: false,
-    //     title : "",
-    //     legend : {
-    //         display:true,
-    //         position:'left'
-    //     }
-    // }
-    /* END ANGULAR CHARTS */
-    
-    /*  USED TO LIVE IN ITEMS for COUNT */
-    // .filter('getCountByType', function() {
-    //     return function (input) {
-    //         var out = [];
-    //         // TODO: Abstract this to detect any type
-    //         var genericCount = 0;
-    //         var youtubeCount = 0;
-    //         var twitterCount = 0;
-    //         var rawCount = 0;
-    //         for (var i = 0; i < input.length; i++) {
-    //             console.log(input[i].Type);
-    //             switch (input[i].Type) {
-    //                 case "generic":
-    //                     genericCount++;
-    //                     break;
-    //                 case "youtube":
-    //                     youtubeCount++;
-    //                     break;
-    //                 case "twitter":
-    //                     twitterCount++;
-    //                     break;
-    //                 case "raw":
-    //                     rawCount++
-    //                     break;
-    //             }
-    //         }
-    //         return {
-    //             generic: genericCount,
-    //             youtube: youtubeCount,
-    //             twitter: twitterCount,
-    //             raw: rawCount
-    //         };
-    //     }
-    // })
