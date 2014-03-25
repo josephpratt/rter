@@ -3,15 +3,14 @@
 *.a
 *.log
 nohup.out
-.classpath
-.project
 *.class
 
 # Folders
-bin
+bin/
+gen/
 pkg
-prototype/videoserver/data/
-!prototype/videoserver/data/log
+prototype/videoserver/data/*
+!prototype/videoserver/data/.gitkeep
 
 ##### Xcode stuff #####
 
