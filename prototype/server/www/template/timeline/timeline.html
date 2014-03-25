@@ -12,148 +12,127 @@
     }
 </style>
 
-<div class="term-view">
-    <div class="control-bar row-fluid">
-        <div class="span4">
-            <b>View:</b>
-            <div class="btn-group" data-toggle="buttons-checkbox">
-                <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'grid-view'">Grid</button>
-                <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'list-view'">List</button>
-                <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'map-view'">Map</button>
-                <button type="button" class="btn btn-primary" ng-model="viewmode" btn-radio="'timeline-view'">Timeline</button>
+<div style="padding-top: 15px;">
+    <div class="row-fluid" collapse="isCollapsed">
+        <div class="well well-small">
+            <div class="row-fluid">
+                <div class="span6">
+                    <label>Date</label> 
+                    <div class="input-append">
+                        <input style="text-align:center; width: 115%;" type="text" ng-model="startDateString" disabled>
+                        <button class="btn btn-primary" ng-click="isStartDateCollapsed = !isStartDateCollapsed">Select Date</button>
+                    </div>
+                    <div collapse="isStartDateCollapsed">
+                        <div class="well well-small">
+                            <div class="row-fluid">
+                                <div class="span7">
+                                    <div ui-date="dateOptions" ng-model="timelineStartTime"></div>
+                                </div>
+                                <div class="span5">
+                                    <div class="row-fluid">
+                                        <div class="span5 input-prepend">
+                                            <span class="add-on">Hour</span>
+                                            <input style="text-align:center; width: 20px" type="text" ng-model="sliderStartVal">
+                                        </div>
+                                        <div class="span7">
+                                            <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStartVal"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span5 input-prepend">
+                                            <span style="width: 30px;" class="add-on">Min</span>
+                                            <input style="text-align:center; width: 20px" type="text" ng-model="sliderStartMinVal">
+                                        </div>
+                                        <div class="span7">
+                                            <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStartMinVal"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid right-align" style="padding-top:83%;">
+                                        <button class="btn btn-danger" ng-click="isStopDateCollapsed = !isStopDateCollapsed">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="padding-top: 10px;" class="input-append">
+                        <input style="text-align:center; width: 115%;" type="text" ng-model="stopDateString" disabled>
+                        <button class="btn btn-primary" ng-click="isStopDateCollapsed = !isStopDateCollapsed">Select Date</button>
+                    </div>
+                    <div collapse="isStopDateCollapsed">
+                        <div class="well well-small">
+                            <div class="row-fluid">
+                                <div class="span7">
+                                    <div ui-date="dateOptions" ng-model="timelineStopTime"></div>
+                                </div>
+                                <div class="span5">
+                                    <div class="row-fluid">
+                                        <div class="span5 input-prepend">
+                                            <span class="add-on">Hour</span>
+                                            <input style="text-align:center; width: 20px" type="text" ng-model="sliderStopVal">
+                                        </div>
+                                        <div class="span7">
+                                            <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStopVal"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid">
+                                        <div class="span5 input-prepend">
+                                            <span style="width: 30px;" class="add-on">Min</span>
+                                            <input style="text-align:center; width: 20px" type="text" ng-model="sliderStopMinVal">
+                                        </div>
+                                        <div class="span7">
+                                            <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStopMinVal"></div>
+                                        </div>
+                                    </div>
+                                    <div class="row-fluid right-align" style="padding-top:83%;">
+                                        <button class="btn btn-danger" ng-click="isStopDateCollapsed = !isStopDateCollapsed">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="span6">
+                    <label for="Tags">Tags</label>
+                    <tag-selector terms="tags"></tag-selector>
+                </div>
             </div>
-        </div>
-        <div class="span6">
-            <b>Filtering:</b>
-            <button class="btn btn-primary" ng-click="isAdvancedCollapsed = !isAdvancedCollapsed">Advanced Settings</button>
-            <!-- <button class="btn btn-primary">Advanced Settings</button> -->
-        </div>
-        <div class="right-align span2">
-            <button class="btn btn-danger" ng-click="close()">Close View</button>
+            <br />
+            <div class="row-fluid">
+                <div class="span6">
+                    <label>Type:</label>
+                    
+                    <label class="checkbox inline">
+                        <input type="checkbox" ng-model="generic"> Generic
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" ng-model="youtube"> Youtube
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" ng-model="twitter"> Twitter
+                    </label>
+                    <label class="checkbox inline">
+                        <input type="checkbox" ng-model="raw"> Raw
+                    </label>
+                </div>
+                <div class="span6">
+                    <label>Saved Filters</label>
+                    <div class="row-fluid">
+                        <div class="span8 input-append">
+                            <select ng-model="querySelected" ng-options="q as q.name for q in queryModel" ng-change="applyQuery()">
+                                <option value="">Select Saved Filter</option>
+                            </select>
+                            <button type="button" class="btn btn-info" ng-click="resetFilters()">Reset</button>
+                        </div>
+                        <div class="span4 right-align">
+                            <button class="btn btn-danger" ng-click="isAdvancedCollapsed = !isAdvancedCollapsed">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    <div style="padding-top: 15px;">
-        <div class="row-fluid" collapse="isAdvancedCollapsed">
-            <div class="well well-small">
-                <div class="row-fluid">
-                    <div class="span6">
-                        <label>Date</label> 
-                        <div class="input-append">
-                            <input style="text-align:center; width: 115%;" type="text" ng-model="startDateString" disabled>
-                            <button class="btn btn-primary" ng-click="isStartDateCollapsed = !isStartDateCollapsed">Select Date</button>
-                        </div>
-                        <div collapse="isStartDateCollapsed">
-                            <div class="well well-small">
-                                <div class="row-fluid">
-                                    <div class="span7">
-                                        <div ui-date="dateOptions" ng-model="timelineStartTime"></div>
-                                    </div>
-                                    <div class="span5">
-                                        <div class="row-fluid">
-                                            <div class="span5 input-prepend">
-                                                <span class="add-on">Hour</span>
-                                                <input style="text-align:center; width: 20px" type="text" ng-model="sliderStartVal">
-                                            </div>
-                                            <div class="span7">
-                                                <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStartVal"></div>
-                                            </div>
-                                        </div>
-                                        <div class="row-fluid">
-                                            <div class="span5 input-prepend">
-                                                <span style="width: 30px;" class="add-on">Min</span>
-                                                <input style="text-align:center; width: 20px" type="text" ng-model="sliderStartMinVal">
-                                            </div>
-                                            <div class="span7">
-                                                <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStartMinVal"></div>
-                                            </div>
-                                        </div>
-                                        <div class="row-fluid right-align" style="padding-top:83%;">
-                                            <button class="btn btn-danger" ng-click="isStopDateCollapsed = !isStopDateCollapsed">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="padding-top: 10px;" class="input-append">
-                            <input style="text-align:center; width: 115%;" type="text" ng-model="stopDateString" disabled>
-                            <button class="btn btn-primary" ng-click="isStopDateCollapsed = !isStopDateCollapsed">Select Date</button>
-                        </div>
-                        <div collapse="isStopDateCollapsed">
-                            <div class="well well-small">
-                                <div class="row-fluid">
-                                    <div class="span7">
-                                        <div ui-date="dateOptions" ng-model="timelineStopTime"></div>
-                                    </div>
-                                    <div class="span5">
-                                        <div class="row-fluid">
-                                            <div class="span5 input-prepend">
-                                                <span class="add-on">Hour</span>
-                                                <input style="text-align:center; width: 20px" type="text" ng-model="sliderStopVal">
-                                            </div>
-                                            <div class="span7">
-                                                <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStopVal"></div>
-                                            </div>
-                                        </div>
-                                        <div class="row-fluid">
-                                            <div class="span5 input-prepend">
-                                                <span style="width: 30px;" class="add-on">Min</span>
-                                                <input style="text-align:center; width: 20px" type="text" ng-model="sliderStopMinVal">
-                                            </div>
-                                            <div class="span7">
-                                                <div style="margin: 10px 5px;" ui-slider min="0" max="23" ng-model="sliderStopMinVal"></div>
-                                            </div>
-                                        </div>
-                                        <div class="row-fluid right-align" style="padding-top:83%;">
-                                            <button class="btn btn-danger" ng-click="isStopDateCollapsed = !isStopDateCollapsed">Close</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="span6">
-                        <label for="Tags">Tags</label>
-                        <tag-selector terms="tags"></tag-selector>
-                    </div>
-                </div>
-                <br />
-                <div class="row-fluid">
-                    <div class="span6">
-                        <label>Type:</label>
-                        
-                        <label class="checkbox inline">
-                            <input type="checkbox" ng-model="generic"> Generic
-                        </label>
-                        <label class="checkbox inline">
-                            <input type="checkbox" ng-model="youtube"> Youtube
-                        </label>
-                        <label class="checkbox inline">
-                            <input type="checkbox" ng-model="twitter"> Twitter
-                        </label>
-                        <label class="checkbox inline">
-                            <input type="checkbox" ng-model="raw"> Raw
-                        </label>
-                    </div>
-                    <div class="span6">
-                        <label>Saved Filters</label>
-                        <div class="row-fluid">
-                            <div class="span8 input-append">
-                                <select ng-model="querySelected" ng-options="q as q.name for q in queryModel" ng-change="applyQuery()">
-                                    <option value="">Select Saved Filter</option>
-                                </select>
-                                <button type="button" class="btn btn-info" ng-click="resetFilters()">Reset</button>
-                            </div>
-                            <div class="span4 right-align">
-                                <button class="btn btn-danger" ng-click="isAdvancedCollapsed = !isAdvancedCollapsed">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row-fluid">
-            <div id="timeline"></div>
-        </div>
+    <div class="row-fluid">
+        <div id="timeline"></div>
     </div>
 </div>

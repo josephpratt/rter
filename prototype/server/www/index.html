@@ -89,48 +89,43 @@
 	<script src="/vendor/tsunami-tpls-0.1.2.min.js"></script>
 
 </head>
-<body ng-controller="RterCtrl">
-	
-	<div id="alerter" ng-controller="AlertsCtrl">
-		<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
-	</div>
+	<body ng-controller="RterCtrl">
+		
+		<div id="alerter" ng-controller="AlertsCtrl">
+			<alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+		</div>
 
-	<header id="appbadge">
-		<img src="asset/rter.png" width="50">
-		<hgroup>
-			<h1>Real-Time Emergency Response</h1>
-			<h2>A project for the Mozilla <a target="_blank" href="https://mozillaignite.org/">Ignite Challenge</a></h2>
-		</hgroup>
-	</header>
+		<header id="appbadge">
+			<img src="asset/rter.png" width="50">
+			<hgroup>
+				<h1>Real-Time Emergency Response</h1>
+				<h2>A project for the Mozilla <a target="_blank" href="https://mozillaignite.org/">Ignite Challenge</a></h2>
+			</hgroup>
+		</header>
 
-	<div class="login-control" ng-switch on="loggedIn">
-		<button class="btn btn-success" ng-switch-when="false" ng-click="login()">Login</button>
-		<button class="btn btn-danger" ng-switch-when="true" ng-click="logout()">Logout</button>
-	</div>
+		<div class="login-control" ng-switch on="loggedIn">
+			<button class="btn btn-success" ng-switch-when="false" ng-click="login()">Login</button>
+			<button class="btn btn-danger" ng-switch-when="true" ng-click="logout()">Logout</button>
+		</div>
 
-	<div ng-controller="TabsCtrl" id="maintabber">
-		<tabs>
-			<pane heading="Submit New Item">
-			 	<create-item>
-				</create-item>
-			</pane>
+		<div ng-controller="TabsCtrl" id="maintabber">
+			<tabs>
+				<pane heading="Submit New Item">
+				 	<create-item>
+					</create-item>
+				</pane>
 
-			<pane heading="+">
-				<tag-cloud></tag-cloud>
- 			</pane>
+				<pane heading="+">
+					<tag-cloud></tag-cloud>
+	 			</pane>
 
-			<pane ng-repeat="view in termViews" heading="{{view.heading}}">
-				<termview term="view.term">
-				</termview>
-			</pane>
+				<pane ng-repeat="view in termViews" heading="{{view.heading}}" active="view.active">
+					<termview term="view.term">
+					</termview>
+				</pane>
+			</tabs>
 
-			<pane ng-repeat="view in termViews" heading="Timeline"  active="view.active">
-				<timeline term="view.term"></timeline>
-			</pane>
-		</tabs>
+		</div>
 
-	</div>
-
-
-</body>
+	</body>
 </html>
