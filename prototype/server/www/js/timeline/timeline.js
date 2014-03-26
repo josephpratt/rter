@@ -13,7 +13,14 @@ angular.module('timeline', [
 
 .controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, CloseupItemDialog, ViewonlyItemDialog, TaxonomyRankingCache) {
     /* -- items and rankings  -- */
-    $scope.viewmode = "timeline-view";
+    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;;
+
+    $scope.$watch('term.Term', function() {
+        $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
+        console.log('#' + $scope.timelineTerm);
+
+        console.log($('#' + $scope.timelineTerm)[0]);
+    }, true)
 
     // Set items to the current contents of the ItemCache
     $scope.items = ItemCache.contents;
@@ -51,14 +58,15 @@ angular.module('timeline', [
     *   -- TimelineTags not populating at startup
     *   -- Map problems
     *   -- Put map in timeline view
-    *   -- "Advanced Settings" button unresponsive after "Close"
     *   -- Selecting a term from the tag cloud doesn't trigger the filter in the timeline
+    *   -- Make the timeline HEIGHT value adjust (on a slider or something)
     *   SECONDARY:
     *   -- Is there a better way to handle the select2 tag box?
     *   -- Make timelineTags read-only in viewonly screen
     *   -- Modal window for items
     *   -- Adjust CSS of timeline item box (use point or range?)
     *   -- Add some statistics on query
+    *   //-- "Advanced Settings" button unresponsive after "Close"
     *   //-- How to filter on timelineTags when tag box is updated?
     *   //-- Fix blur/remove (give it a switch statement on the view?)
     *   //-- Fix minMax (singleton function a watch function to initialize timeline)
@@ -262,6 +270,9 @@ angular.module('timeline', [
         };
 
         // Instantiate our timelineInstance object.
+        var timelineID = "#" + $scope.timelineTerm;
+        // so... what seems to be happening is that dynamically changing the ID is a bad idea.
+        // BUT the "$timline" cannot stay the same... there needs to be multiple timelines ids
         timelineInstance = new links.Timeline($('#timeline')[0]);
 
         // Handles the mouse zoom and drag on the timeline
@@ -485,13 +496,31 @@ angular.module('timeline', [
             term: '=',
             isCollapsed: '='
         },
+        transclude: true,
         templateUrl: '/template/timeline/timeline.html',
         controller: 'TimelineCtrl',
         link: function(scope, element, attrs) {
             
         }
     };
-})
+});
+
+// .directive('termlern', function () {
+//     return {
+//         restrict: 'E',
+//         scope: {
+//             term: '=',
+//         },
+//         transclude: true,
+//         templateUrl: '<div></div>',
+//         controller: 'TimelineCtrl',
+//         link: function(scope, element, attrs) {
+            
+//         }
+//     };
+// });
+
+
 
 // .controller('TagsSelectorCtrl', function($scope, TaxonomyResource) {
 //     if($scope.terms !== undefined) {

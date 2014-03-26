@@ -351,6 +351,14 @@ label {
 	width: 20px;
 }
 
+.timeline-tag-selector .select2-container {
+	width: 100%;
+}
+
+.timeline-tag-selector .select2-container .select2-search-field {
+	width: 20px;
+}
+
 .timeline-tags .select2-container{
 	width: 100%;
 }

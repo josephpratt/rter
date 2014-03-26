@@ -143,6 +143,11 @@ angular.module('taxonomy', [
 })
 
 .controller('TagSelectorCtrl', function($scope, TaxonomyResource) {
+	$scope.thing = true;
+	$scope.$watch('thing', function() {
+		// console.log($scope.thing);
+	}, true);
+
 	if($scope.terms !== undefined) {
 		var concat = "";
 		for(var i = 0;i < $scope.terms.length;i++) {
@@ -150,27 +155,31 @@ angular.module('taxonomy', [
 		}
 		$scope.terms = concat.substring(0, concat.length-1);
 	}
-
 	$scope.tagConfig = {
 		data: TaxonomyResource.query(),
 		multiple: true,
 		id: function(item) {
+			console.log('id');
 			return item.Term;
 		},
 		formatResult: function(item) {
+			console.log('formatResult');
 			return item.Term;
 		},
 		formatSelection: function(item) {
+			console.log('formatSelection');
 			return item.Term;
 		},
 		createSearchChoice: function(term) {
+			console.log('createSearchChoice');
 			return {Term: term};
 		},
 		matcher: function(term, text, option) {
+			console.log('matcher');
 			return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
 		},
 		initSelection: function (element, callback) {
-			// console.log('hi');
+			console.log('initSelection');
 			var data = [];
 			$(element.val().split(",")).each(function (v, a) {
 				data.push({Term: a});
@@ -188,6 +197,63 @@ angular.module('taxonomy', [
 		},
 		templateUrl: '/template/taxonomy/tag-selector.html',
 		controller: 'TagSelectorCtrl',
+		link: function(scope, element, attrs) {
+
+		}
+	};
+})
+
+.controller('TimelineTagSelectorCtrl', function($scope, TaxonomyResource) {
+	if($scope.terms !== undefined) {
+		var concat = "";
+		for(var i = 0;i < $scope.terms.length;i++) {
+			concat += $scope.terms[i].Term + ",";
+		}
+		$scope.terms = concat.substring(0, concat.length-1);
+	}
+	console.log("You callin' me?");
+	$scope.timelineTagConfig = {
+		data: TaxonomyResource.query(),
+		multiple: true,
+		id: function(item) {
+			console.log('id');
+			return item.Term;
+		},
+		formatResult: function(item) {
+			console.log('formatResult');
+			return item.Term;
+		},
+		formatSelection: function(item) {
+			console.log('formatSelection');
+			return item.Term;
+		},
+		createSearchChoice: function(term) {
+			console.log('createSearchChoice');
+			return {Term: term};
+		},
+		matcher: function(term, text, option) {
+			console.log('matcher');
+			return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
+		},
+		initSelection: function (element, callback) {
+			console.log('initSelection');
+			var data = [];
+			$(element.val().split(",")).each(function (v, a) {
+				data.push({Term: a});
+			});
+			callback(data);
+		},
+	};
+})
+
+.directive('timelineTagSelector', function() {
+	return {
+		restrict: 'E',
+		scope: {
+			terms: "="
+		},
+		templateUrl: '/template/taxonomy/timeline-tag-selector.html',
+		controller: 'TimelineTagSelectorCtrl',
 		link: function(scope, element, attrs) {
 
 		}
