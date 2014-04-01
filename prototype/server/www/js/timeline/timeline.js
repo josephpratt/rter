@@ -11,16 +11,8 @@ angular.module('timeline', [
     'ui.slider'
 ])
 
-.controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, CloseupItemDialog, ViewonlyItemDialog, TaxonomyRankingCache) {
-    /* -- items and rankings  -- */
-    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;;
-
-    $scope.$watch('term.Term', function() {
-        $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
-        console.log('#' + $scope.timelineTerm);
-
-        console.log($('#' + $scope.timelineTerm)[0]);
-    }, true)
+.controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, ViewonlyItemDialog, TaxonomyRankingCache) {
+    /* BEGIN Section: items and rankings */
 
     // Set items to the current contents of the ItemCache
     $scope.items = ItemCache.contents;
@@ -43,50 +35,28 @@ angular.module('timeline', [
     $scope.rankedItems;
     $scope.finalFilteredItems;
 
-    $scope.closeupItemDialog = function(item) {
-        CloseupItemDialog.open(item);
-    };
-
+    // modal window when clicking on timeline items
     $scope.viewonlyItemDialog = function(item) {
         ViewonlyItemDialog.open(item);
     };
 
-    /* BEGIN TIMELINE.JS */
+    /* END Section*/
 
-    /* TODOS:
-    *   PRIORITY:
-    *   -- TimelineTags not populating at startup
-    *   -- Map problems
-    *   -- Put map in timeline view
-    *   -- Selecting a term from the tag cloud doesn't trigger the filter in the timeline
-    *   -- Make the timeline HEIGHT value adjust (on a slider or something)
-    *   SECONDARY:
-    *   -- Is there a better way to handle the select2 tag box?
-    *   -- Make timelineTags read-only in viewonly screen
-    *   -- Modal window for items
-    *   -- Adjust CSS of timeline item box (use point or range?)
-    *   -- Add some statistics on query
-    *   //-- "Advanced Settings" button unresponsive after "Close"
-    *   //-- How to filter on timelineTags when tag box is updated?
-    *   //-- Fix blur/remove (give it a switch statement on the view?)
-    *   //-- Fix minMax (singleton function a watch function to initialize timeline)
-    *   //-- Integrate Time sliders
-    *   //-- Fix tag assignment in the tag box
-    *   //-- Readjust Start/Stop Date to match timeline mins/maxs
-    *   //-- Maintain start/stop Date in timeline (do not allow auto-adjust)
-    *   //-- Allow click to bring up item details
-    *   //-- Clamp timeline dates to something reasonable
-    *   //-- Check if timelineTags are removed after corresponding item is removed (if not, will need to populate timelineTags differently)
-    *   //-- Deal with Timezones?
-    *   //-- Do timelineTags go away when all the items using them are removed?
-    */
+
+    /* BEGIN Section: dynamic timeline ID */
+
+    // Attempt to make the timeline ID in the template a dynamic value
+    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
+
+    /* END Section*/
+
+
+    /* BEGIN Section: tags for select2 tag box in Advanced Settings */
 
     // Holds all tags (terms) of the current items displayed on the screen
     $scope.tags;
 
-    /*
-    *   Iterates through an items array, finds all unique tags then alphabetizes them
-    */
+    // Iterates through an items array, finds all unique tags then alphabetizes them
     function getTimelineTags(items) {
         if (items === undefined || items.length === 0) return;
 
@@ -123,6 +93,11 @@ angular.module('timeline', [
         return uniqueArray;
     }
 
+    /* END Section*/
+
+
+    /* BEGIN Section: values for Advanced Filtering controls */
+
     // slider values for manipulating hours and minutes
     $scope.sliderStartVal;
     $scope.sliderStartMinVal;
@@ -133,9 +108,7 @@ angular.module('timeline', [
     $scope.startDateString;
     $scope.stopDateString;
 
-    /*
-    *   Forms the string to display the date and time stamp
-    */
+    // Forms the string to display the date and time stamp
     function getDateString(date) {
         var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         var dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -149,7 +122,7 @@ angular.module('timeline', [
     }
 
     // Toggles the advanced filtering window
-    $scope.isAdvancedCollapsed = true; // replaced by $scope.isCollapsed in termview.js
+    // $scope.isAdvancedCollapsed = true; // replaced by $scope.isCollapsed in termview.js
     $scope.isStartDateCollapsed = true;
     $scope.isStopDateCollapsed = true;
 
@@ -169,17 +142,20 @@ angular.module('timeline', [
         };
     };
 
-    // Main timeline object
-    $scope.timeline;
     // Start and stop times
     // Can be updated by the timeline, items, date/time picker
     $scope.timelineStartTime;
     $scope.timelineStopTime;
 
-    /*
-    *   Obtains initialization values for the timeline and initializes it.
-    *   Also provides a public refresh method to maintain latest values in the timeline
-    */
+    /* END Section*/
+
+
+    /* BEGIN Section:timeline library manager -- */
+    // Main timeline object
+    $scope.timeline;
+
+    // Obtains initialization values for the timeline and initializes it.
+    // Also provides a public refresh method to maintain latest values in the timeline
     var TimelineManager = function (dayOffset, items, onSelectedFn) {
         if (items === undefined || items.length === 0) return;
 
@@ -190,7 +166,9 @@ angular.module('timeline', [
         var min = Date.now();
         var max = new Date(0);
 
-        function getTimelineData(items) { // possibly allow changes to editable, style, content, group in parameters
+        // Concerts items data into an timelineData array, which the timeline.js library handles
+        // possibly allow changes to editable, style, content, group in parameters
+        function getTimelineData(items) {
             for (var i = 0; i < items.length; i++) {
                 var timelineItem = items[i];
 
@@ -328,14 +306,15 @@ angular.module('timeline', [
         };
     };
 
-    /*
-    *   Holds the search query criteria selected in the dropdown menu
-    */
-    $scope.querySelected = [];
+    /* END Section*/
 
-    /*
-    *   Placeholder for saved search queries
-    */
+
+    /* BEGIN Section: Preliminary section for Bookmark feature */
+
+    // Holds the search query criteria selected in the dropdown menu
+    $scope.querySelected = [];
+    
+    // Placeholder for saved search queries
     $scope.queryModel = [
         {
             'id': 1,
@@ -357,54 +336,33 @@ angular.module('timeline', [
         $scope.querySelected = [];
     }
 
-    /*
-    *   Applies the search query criteria to the items data
-    */
+    // Applies the search query criteria to the items data
+    // Currently only applying start and stop times
     $scope.applyQuery = function () {
-        // $scope.tags = [{
-        //     'Term': 'all'
-        // }];
         if ($scope.querySelected !== null && $scope.querySelected.length !== 0) {
             $scope.timelineStartTime = $scope.querySelected.startTime;
             $scope.timelineStopTime = $scope.querySelected.stopTime;
         }
     };
 
-    /* END TIMELINE.JS */
+    /* END Section */
+
+
+    /* BEGIN Section: $watch functions */
 
     $scope.$watch('items', function() {
         // TOTAL HACK for initializing data. I'm unclear how to handle the async issues with items and tags
         // Using the ItemCache and TaxonomyResource.query() are both unreliable at startup
-        if ($scope.items !== undefined) {
+        if ($scope.items) {
             $scope.timeline = $scope.timeline || TimelineManager(3, $scope.items);
             $scope.tags = $scope.tags || getTimelineTags($scope.items);
         }
-
-        if ($scope.timeline !== undefined && $scope.tags !== undefined) {
-            $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
-            $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
-            $scope.filteredByType = $filter('filterByType')($scope.filteredByTime, $scope.typesToDisplay());
-            $scope.filteredByTag = $filter('filterByTag')($scope.filteredByType, $scope.tags);
-            $scope.orderedByID = $filter('orderBy')($scope.filteredByTag, 'ID', true);
-            $scope.orderedByTime = $filter('orderBy')($scope.orderedByID, 'StartTime', true);
-        }
+        $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
     }, true);
-
-    $scope.$watch('[ranking, orderedByTime]', function() {
-        $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
-    }, true);
-
-    $scope.$watch('[rankedItems, filterMode]', function() {
-        $scope.finalFilteredItems = $scope.rankedItems;
-        if ($scope.finalFilteredItems !== undefined && $scope.timeline !== undefined) {
-            $scope.timeline.refresh($scope.finalFilteredItems);    
-        }
-    }, true);
-
-    // Make sure timeline doesn't reach beyond the scope of the data
-    $scope.$watch('[timelineStartTime, timelineStopTime]', function () {
-        if ($scope.timeline !== undefined) {
-            // ensure that when the start/stop times are updated externally that they are clamped
+    
+    $scope.$watch('[filteredItems, timelineStartTime, timelineStopTime]', function () {
+        if ($scope.timeline) {
+            // Ensure that when the start/stop times are updated externally that they are clamped
             if ($scope.timelineStartTime < $scope.timeline.minTime) {
                 $scope.timelineStartTime = $scope.timeline.minTime;
             }
@@ -412,7 +370,7 @@ angular.module('timeline', [
                 $scope.timelineStopTime = $scope.timeline.maxTime;
             }
         }
-
+        // Ensure timelineStartTime and timelineStopTime are defined before getting/setting date values
         if ($scope.timelineStartTime && $scope.timelineStopTime) {
             $scope.sliderStartVal = $scope.timelineStartTime.getHours();
             $scope.sliderStartMinVal = $scope.timelineStartTime.getMinutes();
@@ -421,72 +379,74 @@ angular.module('timeline', [
             $scope.startDateString = getDateString($scope.timelineStartTime);
             $scope.stopDateString = getDateString($scope.timelineStopTime);
         }
-
-        
-    }, true);
-
-    $scope.$watch('tags', function () {
-        $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
         $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
+    }, true);
+    
+    // Apply type filter when filteredByTime or any of item types are updated in the Advanced Filtering
+    $scope.$watch('[filteredByTime, generic, youtube, twitter, raw]', function () {
         $scope.filteredByType = $filter('filterByType')($scope.filteredByTime, $scope.typesToDisplay());
+    }, true);
+    
+    // Apply tag filter when filteredByType or tags is updated
+    $scope.$watch('[filteredByType, tags]', function () {
         $scope.filteredByTag = $filter('filterByTag')($scope.filteredByType, $scope.tags);
         $scope.orderedByID = $filter('orderBy')($scope.filteredByTag, 'ID', true);
         $scope.orderedByTime = $filter('orderBy')($scope.orderedByID, 'StartTime', true);
     }, true);
 
-    $scope.$watch('[timelineStartTime, timelineStopTime, generic, youtube, twitter, raw]', function () {
-        if ($scope.timelineStartTime && $scope.timelineStopTime) {
-            $scope.sliderStartVal = $scope.timelineStartTime.getHours();
-            $scope.sliderStartMinVal = $scope.timelineStartTime.getMinutes();
-            $scope.sliderStopVal = $scope.timelineStopTime.getHours();
-            $scope.sliderStopMinVal = $scope.timelineStopTime.getMinutes();
+    // Apply ranking filter when orderedByTime is updated
+    $scope.$watch('[ranking, orderedByTime]', function() {
+        $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
+    }, true);
 
-            $scope.startDateString = getDateString($scope.timelineStartTime);
-            $scope.stopDateString = getDateString($scope.timelineStopTime);
+    // Updates finalFilteredItems
+    $scope.$watch('[rankedItems, filterMode]', function() {
+        $scope.finalFilteredItems = $scope.rankedItems;
+        // Ensure finalFilteredItems and timeline are proper objects before performing refresh
+        // This "solves" the issue with async delay. 
+        if ($scope.finalFilteredItems && $scope.timeline) {
+            $scope.timeline.refresh($scope.finalFilteredItems);    
         }
-
-        $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
-        $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
-        $scope.filteredByType = $filter('filterByType')($scope.filteredByTime, $scope.typesToDisplay());
-        $scope.filteredByTag = $filter('filterByTag')($scope.filteredByType, $scope.tags);
-        $scope.orderedByID = $filter('orderBy')($scope.filteredByTag, 'ID', true);
-        $scope.orderedByTime = $filter('orderBy')($scope.orderedByID, 'StartTime', true);
     }, true);
 
-    //Slider for Hour control for Start Time
+    // For each of the following, ensure timelineStartTime is a valid value before trying to set values to it
+    // This "solves" the issue with async delay.
+
+    // Watch slider for hour value in timelineStartTime
     $scope.$watch('[sliderStartVal]', function() {
         if ($scope.timelineStartTime) {
             $scope.timelineStartTime.setHours($scope.sliderStartVal);   
         }
     }, true);
     
-    //Slider for Minute Control for Start Time
+    // Watch slider for minute value in timelineStartTime
     $scope.$watch('[sliderStartMinVal]', function() {
         if ($scope.timelineStartTime) {
             $scope.timelineStartTime.setMinutes($scope.sliderStartMinVal);  
         }
     }, true);
 
-    //for stop slider
+    // Watch slider for hour value in timelineStopTime
     $scope.$watch('[sliderStopVal]', function() {
         if ($scope.timelineStopTime) {
             $scope.timelineStopTime.setHours($scope.sliderStopVal); 
         }
     }, true);
 
-    //Slider for Minute Control for Stop Time
+    // Watch slider for minute value in timelineStopTime
     $scope.$watch('[sliderStopMinVal]', function() {
-        // Why are we checking this?
         if ($scope.timelineStopTime) {
             $scope.timelineStopTime.setMinutes($scope.sliderStopMinVal);    
         }
     }, true);
 
-    // $scope.$watch('querySelected', function() {
-    //     console.log('query');
-    //     // $scope.timelineStartTime = $scope.querySelected.startTime;
-    //     // $scope.timelineStopTime = $scope.querySelected.stopTime;
-    // }, true);
+    // For updating the timeline ID (Still not working...)
+    $scope.$watch('term.Term', function() {
+        $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
+    }, true);
+
+    /* END Section*/
+
 })
 
 .directive('timeline', function () {
@@ -504,77 +464,3 @@ angular.module('timeline', [
         }
     };
 });
-
-// .directive('termlern', function () {
-//     return {
-//         restrict: 'E',
-//         scope: {
-//             term: '=',
-//         },
-//         transclude: true,
-//         templateUrl: '<div></div>',
-//         controller: 'TimelineCtrl',
-//         link: function(scope, element, attrs) {
-            
-//         }
-//     };
-// });
-
-
-
-// .controller('TagsSelectorCtrl', function($scope, TaxonomyResource) {
-//     if($scope.terms !== undefined) {
-//         var concat = "";
-//         for(var i = 0;i < $scope.terms.length;i++) {
-//             concat += $scope.terms[i].Term + ",";
-//         }
-//         $scope.terms = concat.substring(0, concat.length-1);
-//     }
-
-//     $scope.tagsConfig = {
-//         data: TaxonomyResource.query(),
-//         multiple: true,
-//         id: function(item) {
-//             console.log('hi');
-//             return item.Term;
-//         },
-//         formatResult: function(item) {
-//             console.log('hi');
-//             return item.Term;
-//         },
-//         formatSelection: function(item) {
-//             console.log('hi');
-//             return item.Term;
-//         },
-//         createSearchChoice: function(term) {
-//             console.log('hi');
-//             return {Term: term};
-//         },
-//         matcher: function(term, text, option) {
-//             console.log('hi');
-//             return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
-//         },
-//         initSelection: function (element, callback) {
-//             var data = [];
-//             $(element.val().split(",")).each(function (v, a) {
-//                 data.push({Term: a});
-//             });
-//             console.log(data);
-//             callback(data);
-//         },
-//     };
-// })
-
-// .directive('tagSelector', function() {
-//     return {
-//         restrict: 'E',
-//         scope: {
-//             terms: "="
-//         },
-//         templateUrl: '/template/taxonomy/tag-selector.html',
-//         controller: 'TagSelectorCtrl',
-//         link: function(scope, element, attrs) {
-
-//         }
-//     };
-// });

@@ -143,11 +143,6 @@ angular.module('taxonomy', [
 })
 
 .controller('TagSelectorCtrl', function($scope, TaxonomyResource) {
-	$scope.thing = true;
-	$scope.$watch('thing', function() {
-		// console.log($scope.thing);
-	}, true);
-
 	if($scope.terms !== undefined) {
 		var concat = "";
 		for(var i = 0;i < $scope.terms.length;i++) {
@@ -211,7 +206,7 @@ angular.module('taxonomy', [
 		}
 		$scope.terms = concat.substring(0, concat.length-1);
 	}
-	console.log("You callin' me?");
+	
 	$scope.timelineTagConfig = {
 		data: TaxonomyResource.query(),
 		multiple: true,
