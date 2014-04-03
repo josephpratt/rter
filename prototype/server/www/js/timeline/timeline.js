@@ -11,7 +11,7 @@ angular.module('timeline', [
     'ui.slider'
 ])
 
-.controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, ViewonlyItemDialog, TaxonomyRankingCache) {
+.controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, ViewonlyItemDialog, TaxonomyRankingCache, TaxonomyResource) {
     /* BEGIN Section: items and rankings */
 
     // Set items to the current contents of the ItemCache
@@ -79,6 +79,7 @@ angular.module('timeline', [
             uniqueArray.push(array[i]);
         }
         // sort alphabetically
+        console.log(uniqueArray);
         uniqueArray.sort(function(a, b) {
             var termA = a.Term.toLowerCase();
             var termB = b.Term.toLowerCase();
@@ -156,7 +157,8 @@ angular.module('timeline', [
 
     // Obtains initialization values for the timeline and initializes it.
     // Also provides a public refresh method to maintain latest values in the timeline
-    var TimelineManager = function (dayOffset, items, onSelectedFn) {
+    var count;
+    var TimelineManager = function (dayOffset, items) {
         if (items === undefined || items.length === 0) return;
 
         var dayOffset = dayOffset || 0;
@@ -248,10 +250,12 @@ angular.module('timeline', [
         };
 
         // Instantiate our timelineInstance object.
-        var timelineID = "#" + $scope.timelineTerm;
+        
         // so... what seems to be happening is that dynamically changing the ID is a bad idea.
         // BUT the "$timline" cannot stay the same... there needs to be multiple timelines ids
-        timelineInstance = new links.Timeline($('#timeline')[0]);
+        $element.find('#timeline').attr('id', $scope.timelineTerm);
+        var timelineID = "#" + $scope.timelineTerm;
+        timelineInstance = new links.Timeline($(timelineID)[0]);
 
         // Handles the mouse zoom and drag on the timeline
         function onRangeChanged(e) {
@@ -280,7 +284,6 @@ angular.module('timeline', [
                 // $scope.closeupItemDialog(item);
                 // TODO: is there ANY way to decouple these $scope variables?
                 $scope.viewonlyItemDialog(item);
-                // onSelectedFn(items);
                 $scope.$apply();
             });
         }
@@ -353,10 +356,7 @@ angular.module('timeline', [
     $scope.$watch('items', function() {
         // TOTAL HACK for initializing data. I'm unclear how to handle the async issues with items and tags
         // Using the ItemCache and TaxonomyResource.query() are both unreliable at startup
-        if ($scope.items) {
-            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.items);
-            $scope.tags = $scope.tags || getTimelineTags($scope.items);
-        }
+        $scope.tags = $scope.tags || getTimelineTags($scope.items);
         $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
     }, true);
     
@@ -402,6 +402,7 @@ angular.module('timeline', [
     // Updates finalFilteredItems
     $scope.$watch('[rankedItems, filterMode]', function() {
         $scope.finalFilteredItems = $scope.rankedItems;
+        $scope.timeline = TimelineManager(3, $scope.finalFilteredItems);
         // Ensure finalFilteredItems and timeline are proper objects before performing refresh
         // This "solves" the issue with async delay. 
         if ($scope.finalFilteredItems && $scope.timeline) {
@@ -445,7 +446,50 @@ angular.module('timeline', [
         $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
     }, true);
 
+    $scope.$watch('[viewmode]', function () {
+        if ($scope.viewmode === 'timeline-view') {
+            // when we add the OR logic, the timeline doesn't repopulate with ALL the items when in a term tab,
+            // Unsure of other side-effects atm, but I'm pretty sure there are some.
+            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.items);
+        }
+    }, true);
+
     /* END Section*/
+    if($scope.terms !== undefined) {
+        var concat = "";
+        for(var i = 0;i < $scope.terms.length;i++) {
+            concat += $scope.terms[i].Term + ",";
+        }
+        $scope.terms = concat.substring(0, concat.length-1);
+    }
+    
+    $scope.timelineTagConfig = {
+        data: TaxonomyResource.query(),
+        multiple: true,
+        id: function(item) {
+            return item.Term;
+        },
+        formatResult: function(item) {
+            return item.Term;
+        },
+        formatSelection: function(item) {
+            return item.Term;
+        },
+        createSearchChoice: function(term) {
+            return {Term: term};
+        },
+        matcher: function(term, text, option) {
+            return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
+        },
+        initSelection: function (element, callback) {
+            console.log('you call?');
+            var data = [];
+            $(element.val().split(",")).each(function (v, a) {
+                data.push({Term: a});
+            });
+            callback(data);
+        },
+    };
 
 })
 
@@ -454,12 +498,13 @@ angular.module('timeline', [
         restrict: 'E',
         scope: {
             term: '=',
-            isCollapsed: '='
+            isCollapsed: '=',
+            viewmode: '='
         },
         transclude: true,
         templateUrl: '/template/timeline/timeline.html',
         controller: 'TimelineCtrl',
-        link: function(scope, element, attrs) {
+        link: function(scope, elem, attrs) {
             
         }
     };

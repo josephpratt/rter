@@ -154,27 +154,21 @@ angular.module('taxonomy', [
 		data: TaxonomyResource.query(),
 		multiple: true,
 		id: function(item) {
-			console.log('id');
 			return item.Term;
 		},
 		formatResult: function(item) {
-			console.log('formatResult');
 			return item.Term;
 		},
 		formatSelection: function(item) {
-			console.log('formatSelection');
 			return item.Term;
 		},
 		createSearchChoice: function(term) {
-			console.log('createSearchChoice');
 			return {Term: term};
 		},
 		matcher: function(term, text, option) {
-			console.log('matcher');
 			return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
 		},
 		initSelection: function (element, callback) {
-			console.log('initSelection');
 			var data = [];
 			$(element.val().split(",")).each(function (v, a) {
 				data.push({Term: a});
@@ -211,27 +205,21 @@ angular.module('taxonomy', [
 		data: TaxonomyResource.query(),
 		multiple: true,
 		id: function(item) {
-			console.log('id');
 			return item.Term;
 		},
 		formatResult: function(item) {
-			console.log('formatResult');
 			return item.Term;
 		},
 		formatSelection: function(item) {
-			console.log('formatSelection');
 			return item.Term;
 		},
 		createSearchChoice: function(term) {
-			console.log('createSearchChoice');
 			return {Term: term};
 		},
 		matcher: function(term, text, option) {
-			console.log('matcher');
 			return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
 		},
 		initSelection: function (element, callback) {
-			console.log('initSelection');
 			var data = [];
 			$(element.val().split(",")).each(function (v, a) {
 				data.push({Term: a});
