@@ -136,6 +136,26 @@
         </div>
     </div>
     <div class="row-fluid">
-        <div id="timeline"></div>
+        <div id="timeline" class="left span8"></div>
+        <div class="right span4">
+            <div class="filter filter-map">
+                <header>
+                    <label for="mapFitlerEnable">Map Filter</label>
+                    <div class="btn-group" name="mapFilterEnable" data-toggle="buttons-checkbox">
+                        <button type="button" class="btn btn-primary" ng-model="mapFilterEnable" btn-radio="true">On</button>
+                        <button type="button" class="btn btn-primary" ng-model="mapFilterEnable" btn-radio="false">Off</button>
+                    </div>
+                </header>
+
+                <map map-items="mapItems" map-bounds="mapBounds" viewmode="viewmode"></map>
+
+                <!-- <div ng-repeat="bundle in markerBundles" ui-map-marker="bundle.marker"
+                  ui-event="{'map-click': 'closeupItemDialog(bundle.item)'}">
+                </div>
+                <div id="map_canvas" class="map" ui-map="map" ui-options="mapOptions" ui-event="{'map-dragend': 'boundsChanged()', 'map-zoom_changed': 'boundsChanged()'}"></div> -->
+
+                <!-- 'bounds_changed center_changed click dblclick drag dragend dragstart heading_changed idle maptypeid_changed mousemove mouseout mouseover projection_changed resize rightclick tilesloaded tilt_changed zoom_changed' -->   
+            </div>
+        </div>
     </div>
 </div>

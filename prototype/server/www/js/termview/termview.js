@@ -4,6 +4,7 @@ angular.module('termview', [
     'items',    //ItemCache to load items into termview, various itemDialog services
     'taxonomy', //Rankings
     'alerts',    //Alerter
+    'map',
     'timeline'
 ])
 
@@ -48,18 +49,6 @@ angular.module('termview', [
     $scope.filterMode = "blur";
     $scope.mapFilterEnable = false;
 
-    $scope.$watch('mapFilterEnable', function() {
-        $scope.boundsChanged();
-    });
-
-    $scope.$watch('viewmode', function(newVal, oldVal) {
-        $scope.mapCenter = $scope.map.getCenter();
-
-        $timeout(function() {
-            $scope.resizeMap();
-        }, 0);
-    });
-
     /* -- items and rankings  -- */
 
     $scope.rankingCache = new TaxonomyRankingCache($scope.term.Term);
@@ -86,7 +75,7 @@ angular.module('termview', [
     $scope.finalFilteredItems = $scope.rankedItems;
 
     $scope.textSearchedItems = $filter('filter')($scope.rankedItems, $scope.filterQuery);
-    $scope.mapFilteredItems = $filter('filterbyBounds')($scope.textSearchedItems, $scope.mapBounds);
+    $scope.mapItems = $filter('filterbyBounds')($scope.textSearchedItems, $scope.mapBounds);
 
     $scope.$watch('items', function() {
         $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
@@ -105,35 +94,27 @@ angular.module('termview', [
         }
     }, true);
 
-    $scope.$watch('[rankedItems, textQuery, filterMode]', function() {
-        // if($scope.filterMode == 'remove') {
-            $scope.textSearchedItems = $filter('filter')($scope.rankedItems, $scope.textQuery);
-        // }
-    }, true);
-
-    $scope.$watch('[textSearchedItems, filterMode]', function() {
-        // if($scope.filterMode == 'remove') {
-            $scope.finalMapItems = $scope.textSearchedItems;
-        // }
-    }, true);
-
-    $scope.$watch('finalMapItems', function() {
-        $scope.updateMarkers();
-    }, true);
-
-    $scope.$watch('[textSearchedItems, mapBounds, mapFilterEnable, filterMode]', function() {
+     $scope.$watch('[rankedItems, mapBounds, mapFilterEnable, filterMode]', function() {
         if($scope.filterMode == 'remove') {
             if($scope.mapFilterEnable) {
-                $scope.mapFilteredItems = $filter('filterbyBounds')($scope.textSearchedItems, $scope.mapBounds);
+                $scope.mapItems = $filter('filterbyBounds')($scope.rankedItems, $scope.mapBounds);
             } else {
-                $scope.mapFilteredItems = $scope.textSearchedItems;
+                $scope.mapItems = $scope.rankedItems;
             }
         }
     }, true);
 
-    $scope.$watch('[mapFilteredItems, filterMode]', function() {
+    $scope.$watch('[mapItems, textQuery, filterMode]', function() {
+        // if($scope.filterMode == 'remove') {
+            $scope.textSearchedItems = $filter('filter')($scope.mapItems, $scope.textQuery);
+        // }
+    }, true);
+
+   
+
+    $scope.$watch('[textSearchedItems, filterMode]', function() {
         if($scope.filterMode == 'remove') {
-            $scope.finalFilteredItems = $scope.mapFilteredItems;
+            $scope.finalFilteredItems = $scope.textSearchedItems;
         }
     }, true);
 
@@ -192,56 +173,6 @@ angular.module('termview', [
         TermViewRemote.removeTermView($scope.term);
     };
 
-    /* -- Map -- */
-
-    $scope.boundsChanged = function() {
-        $scope.mapBounds = $scope.map.getBounds();
-    };
-
-    $scope.markerBundles = [];
-
-    $scope.mapCenter = new google.maps.LatLng(45.50745, -73.5793);
-
-    $scope.mapOptions = {
-        center: $scope.mapCenter,
-        zoom: 10,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-
-    $scope.resizeMap = function() {
-        google.maps.event.trigger($scope.map, "resize");
-        $scope.map.setCenter($scope.mapCenter);
-        $scope.mapBounds = $scope.map.getBounds();
-    };
-
-    $scope.updateMarkers = function() {
-        angular.forEach($scope.markerBundles, function(v) {
-            v.marker.setMap(null);
-        });
-
-        $scope.markerBundles = [];
-
-        angular.forEach($scope.finalMapItems, function(v) {
-            if(v.Lat === undefined || v.Lng === undefined || (v.Lat === 0 && v.Lng === 0)) return;
-
-            var m = new google.maps.Marker({
-                map: $scope.map,
-                position: new google.maps.LatLng(v.Lat, v.Lng)
-            });
-
-            if(v.ThumbnailURI !== undefined && v.ThumbnailURI !== "") {
-                m.setIcon(new google.maps.MarkerImage(v.ThumbnailURI, null, null, null, new google.maps.Size(40, 40)));
-            }
-
-            $scope.markerBundles.push({marker: m, item: v});
-        });
-    };
-
-    $scope.centerAt = function(location) {
-        var latlng = new google.maps.LatLng(location.coords.latitude, location.coords.longitude);
-        $scope.map.setCenter(latlng);
-        $scope.mapCenter = latlng;
-    };
 })
 
 .directive('termview', function() {
@@ -253,7 +184,7 @@ angular.module('termview', [
         templateUrl: '/template/termview/termview.html',
         controller: 'TermViewCtrl',
         link: function(scope, element, attrs) {
-            navigator.geolocation.getCurrentPosition(scope.centerAt);
+            // navigator.geolocation.getCurrentPosition(scope.centerAt);
         }
     };
 });

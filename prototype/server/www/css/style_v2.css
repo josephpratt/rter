@@ -118,18 +118,18 @@ label {
 
 /* -- Term View Controls -- */
 
-.term-view .grid-view .right, .term-view .list-view .right  {
+.term-view .grid-view .right, .term-view .list-view .right, .term-view .timeline-view .right  {
 	padding-top: 15px;
 }
 
-.term-view .grid-view .right .map, .term-view .list-view .right .map {
+.term-view .grid-view .right .map, .term-view .list-view .right .map, .term-view .timeline-view .right .map {
 	height: 350px;
 	width: 315px;
 
 	margin: 0 auto 15px auto;
 }
 
-.term-view .grid-view .right .filter, .term-view .list-view .right .filter  {
+.term-view .grid-view .right .filter, .term-view .list-view .right .filter, .term-view .timeline-view .right .filter  {
 	padding-top: 10px;
 	padding-bottom: 10px;
 
@@ -144,15 +144,15 @@ label {
 	text-align: center;
 }
 
-.term-view .grid-view .filter header, .term-view .list-view .filter header {
+.term-view .grid-view .filter header, .term-view .list-view .filter header, .term-view .timeline-view .filter header {
 	margin-bottom: 10px;
 }
 
-.term-view .grid-view .filter header label, .term-view .list-view .filter header label {
+.term-view .grid-view .filter header label, .term-view .list-view .filter header label, .term-view .timeline-view .filter header label{
 	display: inline-block;
 }
 
-.term-view .grid-view .filter header .btn-group, .term-view .list-view .filter header .btn-group {
+.term-view .grid-view .filter header .btn-group, .term-view .list-view .filter header .btn-group, .term-view .timeline-view .filter header .btn-group {
 	margin-left: 10px;
 }
 
@@ -164,11 +164,11 @@ label {
 	margin-bottom: 15px;
 }
 
-.term-view .grid-view .filter-search, .term-view .list-view .filter-search {
+.term-view .grid-view .filter-search, .term-view .list-view .filter-search, .term-view .timeline-view .filter-search {
 	margin-bottom: 25px;
 }
 
-.term-view .grid-view .filter-search input, .term-view .list-view .filter-search input {
+.term-view .grid-view .filter-search input, .term-view .list-view .filter-search input, .term-view .timeline-view .filter-search input {
 	display: block;
 	margin: auto;
 }

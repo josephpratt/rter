@@ -1,0 +1,4 @@
+<div>
+    <div ng-repeat="bundle in markerBundles" ui-map-marker="bundle.marker" ui-event="{'map-click': 'closeupItemDialog(bundle.item)'}"></div>
+    <div id="map_canvas" class="map" ui-map="map" ui-options="mapOptions" ui-event="{'map-dragend': 'boundsChanged()', 'map-zoom_changed': 'boundsChanged()'}"></div>
+</div>

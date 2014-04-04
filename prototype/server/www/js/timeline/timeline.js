@@ -8,31 +8,37 @@ angular.module('timeline', [
     'sockjs',
     'ui.bootstrap.accordion',
     'ui.bootstrap.transition',
-    'ui.slider'
+    'ui.slider',
+    'map'
 ])
 
 .controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, ViewonlyItemDialog, TaxonomyRankingCache, TaxonomyResource) {
+    $scope.mapFilterEnable = false;
+
     /* BEGIN Section: items and rankings */
 
     // Set items to the current contents of the ItemCache
-    $scope.items = ItemCache.contents;
+    // $scope.items = ItemCache.contents;
 
-    // Get rankings from items cache
-    $scope.rankingCache = new TaxonomyRankingCache($scope.term.Term);
+    // // Get rankings from items cache
+    // $scope.rankingCache = new TaxonomyRankingCache($scope.term.Term);
 
-    $scope.$on("$destroy", function() {
-        if($scope.rankingCache.close !== undefined) $scope.rankingCache.close();
-    });
+    // $scope.$on("$destroy", function() {
+    //     if($scope.rankingCache.close !== undefined) $scope.rankingCache.close();
+    // });
 
-    if($scope.term.Term === "" || $scope.term.Term === undefined) {
-        $scope.ranking = [];
-    } else {
-        $scope.ranking = $scope.rankingCache.ranking;
-    }
+    // if($scope.term.Term === "" || $scope.term.Term === undefined) {
+    //     $scope.ranking = [];
+    // } else {
+    //     $scope.ranking = $scope.rankingCache.ranking;
+    // }
+
+    // $scope.items = $scope.rankedItems;
 
     $scope.orderedByID;
     $scope.orderedByTime;
     $scope.rankedItems;
+    $scope.mapItems;
     $scope.finalFilteredItems;
 
     // modal window when clicking on timeline items
@@ -79,7 +85,6 @@ angular.module('timeline', [
             uniqueArray.push(array[i]);
         }
         // sort alphabetically
-        console.log(uniqueArray);
         uniqueArray.sort(function(a, b) {
             var termA = a.Term.toLowerCase();
             var termB = b.Term.toLowerCase();
@@ -157,7 +162,6 @@ angular.module('timeline', [
 
     // Obtains initialization values for the timeline and initializes it.
     // Also provides a public refresh method to maintain latest values in the timeline
-    var count;
     var TimelineManager = function (dayOffset, items) {
         if (items === undefined || items.length === 0) return;
 
@@ -240,7 +244,7 @@ angular.module('timeline', [
         // TODO: Make Height variable/adjustable?
         timelineOptions = {
             'width':  '100%',
-            'height': '300px',
+            'height': '427px',
             'editable': false,
             'box.align': 'left',
             'start': min,
@@ -353,11 +357,13 @@ angular.module('timeline', [
 
     /* BEGIN Section: $watch functions */
 
-    $scope.$watch('items', function() {
-        // TOTAL HACK for initializing data. I'm unclear how to handle the async issues with items and tags
-        // Using the ItemCache and TaxonomyResource.query() are both unreliable at startup
-        $scope.tags = $scope.tags || getTimelineTags($scope.items);
-        $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
+    // 1. Get the items from termview (already filtered by )
+
+    $scope.$watch('rankedItems', function() {
+        // Initialize $scope.tags when we get items
+        $scope.tags = $scope.tags || getTimelineTags($scope.rankedItems);
+        $scope.filteredItems = $scope.rankedItems;
+        // $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
     }, true);
     
     $scope.$watch('[filteredItems, timelineStartTime, timelineStopTime]', function () {
@@ -380,6 +386,7 @@ angular.module('timeline', [
             $scope.stopDateString = getDateString($scope.timelineStopTime);
         }
         $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
+        console.log($scope.filteredByTime);
     }, true);
     
     // Apply type filter when filteredByTime or any of item types are updated in the Advanced Filtering
@@ -389,20 +396,34 @@ angular.module('timeline', [
     
     // Apply tag filter when filteredByType or tags is updated
     $scope.$watch('[filteredByType, tags]', function () {
+
         $scope.filteredByTag = $filter('filterByTag')($scope.filteredByType, $scope.tags);
-        $scope.orderedByID = $filter('orderBy')($scope.filteredByTag, 'ID', true);
-        $scope.orderedByTime = $filter('orderBy')($scope.orderedByID, 'StartTime', true);
+        // $scope.orderedByID = $filter('orderBy')($scope.filteredByTag, 'ID', true);
+        // $scope.orderedByTime = $filter('orderBy')($scope.orderedByID, 'StartTime', true);
     }, true);
 
     // Apply ranking filter when orderedByTime is updated
-    $scope.$watch('[ranking, orderedByTime]', function() {
-        $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
+    // $scope.$watch('[ranking, orderedByTime]', function() {
+    //     // $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
+    // }, true);
+
+    $scope.$watch('[filteredByTag, mapBounds, mapFilterEnable]', function() {
+        if($scope.mapFilterEnable) {
+            $scope.mapItems = $filter('filterbyBounds')($scope.filteredByTag, $scope.mapBounds);
+        } else {
+            $scope.mapItems = $scope.filteredByTag;
+        }
+    }, true);
+
+    $scope.$watch('[mapFilteredItems, filterMode]', function() {
+        if($scope.filterMode == 'remove') {
+            $scope.finalFilteredItems = $scope.mapFilteredItems;
+        }
     }, true);
 
     // Updates finalFilteredItems
-    $scope.$watch('[rankedItems, filterMode]', function() {
-        $scope.finalFilteredItems = $scope.rankedItems;
-        $scope.timeline = TimelineManager(3, $scope.finalFilteredItems);
+    $scope.$watch('mapItems', function() {
+        $scope.finalFilteredItems = $scope.mapItems;
         // Ensure finalFilteredItems and timeline are proper objects before performing refresh
         // This "solves" the issue with async delay. 
         if ($scope.finalFilteredItems && $scope.timeline) {
@@ -450,58 +471,23 @@ angular.module('timeline', [
         if ($scope.viewmode === 'timeline-view') {
             // when we add the OR logic, the timeline doesn't repopulate with ALL the items when in a term tab,
             // Unsure of other side-effects atm, but I'm pretty sure there are some.
-            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.items);
+            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.rankedItems);
         }
     }, true);
 
     /* END Section*/
-    if($scope.terms !== undefined) {
-        var concat = "";
-        for(var i = 0;i < $scope.terms.length;i++) {
-            concat += $scope.terms[i].Term + ",";
-        }
-        $scope.terms = concat.substring(0, concat.length-1);
-    }
-    
-    $scope.timelineTagConfig = {
-        data: TaxonomyResource.query(),
-        multiple: true,
-        id: function(item) {
-            return item.Term;
-        },
-        formatResult: function(item) {
-            return item.Term;
-        },
-        formatSelection: function(item) {
-            return item.Term;
-        },
-        createSearchChoice: function(term) {
-            return {Term: term};
-        },
-        matcher: function(term, text, option) {
-            return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
-        },
-        initSelection: function (element, callback) {
-            console.log('you call?');
-            var data = [];
-            $(element.val().split(",")).each(function (v, a) {
-                data.push({Term: a});
-            });
-            callback(data);
-        },
-    };
-
 })
 
 .directive('timeline', function () {
     return {
         restrict: 'E',
+        transclude: true,
         scope: {
             term: '=',
+            rankedItems: '=',
             isCollapsed: '=',
             viewmode: '='
         },
-        transclude: true,
         templateUrl: '/template/timeline/timeline.html',
         controller: 'TimelineCtrl',
         link: function(scope, elem, attrs) {
