@@ -10,9 +10,12 @@
         height: .8em;
         cursor: default;
     }
+    .timeline-view {
+        padding-top: 15px;
+    }
 </style>
 
-<div style="padding-top: 15px;">
+<div>
     <div class="row-fluid" collapse="isCollapsed">
         <div class="well well-small">
             <div class="row-fluid">
@@ -116,13 +119,14 @@
                     </label>
                 </div>
                 <div class="span6">
-                    <label>Saved Filters</label>
+                    <!-- <label>Saved Filters</label> -->
+                    <label>&nbsp;</label>
                     <div class="row-fluid">
                         <div class="span8 input-append">
-                            <select ng-model="querySelected" ng-options="q as q.name for q in queryModel" ng-change="applyQuery()">
+                            <!-- <select ng-model="querySelected" ng-options="q as q.name for q in queryModel" ng-change="applyQuery()">
                                 <option value="">Select Saved Filter</option>
                             </select>
-                            <button type="button" class="btn btn-info" ng-click="resetFilters()">Reset</button>
+                            <button type="button" class="btn btn-info" ng-click="resetFilters()">Reset</button> -->
                         </div>
                         <div class="span4 right-align">
                             <button class="btn btn-danger" ng-click="isCollapsed = !isCollapsed">Close</button>

@@ -22,7 +22,7 @@ angular.module('timeline', [
     };
 
     // Attempt to make the timeline ID in the template a dynamic value
-    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term.replace(/\:/, '_');
+    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term.replace(/^\w/, '_');
 
     /* BEGIN Section: tags for select2 tag box in Advanced Settings */
 

@@ -118,7 +118,7 @@ label {
 
 /* -- Term View Controls -- */
 
-.term-view .grid-view .right, .term-view .list-view .right, .term-view .timeline-view .right  {
+.term-view .grid-view .right, .term-view .list-view .right {
 	padding-top: 15px;
 }
 

@@ -20,19 +20,20 @@ angular.module('rawItem', [])
 })
 
 .controller('CloseupRawItemCtrl', function($scope) {
-
+	
 })
 
 .directive('closeupRawItem', function() {
 	return {
 		restrict: 'E',
+		transclude: true,
 		scope: {
 			item: "="
 		},
 		templateUrl: '/template/items/raw/closeup-raw-item.html',
 		controller: 'CloseupRawItemCtrl',
 		link: function(scope, element, attr) {
-
+			
 		}
 	};
 });

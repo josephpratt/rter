@@ -90,7 +90,7 @@ angular.module('termview', [
         }
     }, true);
 
-    $scope.$watch('[mapItems, textQuery]', function() {
+    $scope.$watch('[mapItems, textQuery, filterMode]', function() {
         if($scope.filterMode == 'remove') {
             $scope.finalFilteredItems = $filter('filter')($scope.mapItems, $scope.textQuery);
         } else {

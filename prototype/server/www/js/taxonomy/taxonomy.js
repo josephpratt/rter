@@ -142,6 +142,38 @@ angular.module('taxonomy', [
 	);
 })
 
+.controller('TagListCtrl', function($scope) {
+	$scope.tagList = '';
+	function getRawItemTags(tags) {
+		console.log(tags);
+		if (!tags || tags.Terms.length === 0) return;
+		var terms = "";
+		for (var i = 0; i < tags.Terms.length; i++) {
+			terms += tags.Terms[i].Term + ", ";
+		}
+		return terms.substring(0, terms.length - 2);
+	}
+	
+	$scope.$watch('item', function () {
+		$scope.tagList = getRawItemTags($scope.item);
+	}, true);
+
+})
+
+.directive('tagList', function () {
+	return {
+		restrict: 'E',
+		scope: {
+			item: '='
+		},
+		templateUrl: '/template/taxonomy/tag-list.html',
+		controller: 'TagListCtrl',
+		link: function(scope, element, attrs) {
+
+		}
+	}
+})
+
 .controller('TagSelectorCtrl', function($scope, TaxonomyResource) {
 	$scope.tagConfig = {
 		data: TaxonomyResource.query(),
