@@ -1,11 +1,12 @@
 angular.module('termview', [
     'ng',       //filers
-    'ui',       //ui-sortable and map
+    'ui',       //ui-sortable and google map
     'items',    //ItemCache to load items into termview, various itemDialog services
     'taxonomy', //Rankings
-    'alerts',    //Alerter
-    'map',
-    'timeline'
+    'alerts',   //Alerter
+    'map',      //map ctrl
+    'timeline',
+    'ui.select2'
 ])
 
 .factory('TermViewRemote', function () {
@@ -79,7 +80,6 @@ angular.module('termview', [
 
     $scope.$watch('[ranking, orderedByTime]', function() {
         $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
-        console.log($scope.term.Term);
     }, true);
 
     $scope.$watch('[rankedItems, mapBounds, mapFilterEnabled, filterMode]', function() {

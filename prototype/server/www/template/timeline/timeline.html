@@ -17,7 +17,7 @@
         <div class="well well-small">
             <div class="row-fluid">
                 <div class="span6">
-                    <label>Date {{timelineTerm}}</label> 
+                    <label>Date</label> 
                     <div class="input-append">
                         <input style="text-align:center; width: 115%;" type="text" ng-model="startDateString" disabled>
                         <button class="btn btn-primary" ng-click="isStartDateCollapsed = !isStartDateCollapsed">Select Date</button>
@@ -94,10 +94,7 @@
                 </div>
                 <div class="span6">
                     <label for="Tags">Tags</label>
-                    <timeline-tag-selector terms="tags"></timeline-tag-selector>
-                    <!-- <fieldset class="timeline-tag-selector">
-                        <div name="TimelineTags" multiple ui-select2="timelineTagConfig" ng-model="terms"></div>
-                    </fieldset> -->
+                    <tag-selector terms="tags"></tag-selector>
                 </div>
             </div>
             <br />

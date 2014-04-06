@@ -143,13 +143,6 @@ angular.module('taxonomy', [
 })
 
 .controller('TagSelectorCtrl', function($scope, TaxonomyResource) {
-	if($scope.terms !== undefined) {
-		var concat = "";
-		for(var i = 0;i < $scope.terms.length;i++) {
-			concat += $scope.terms[i].Term + ",";
-		}
-		$scope.terms = concat.substring(0, concat.length-1);
-	}
 	$scope.tagConfig = {
 		data: TaxonomyResource.query(),
 		multiple: true,
@@ -170,11 +163,12 @@ angular.module('taxonomy', [
 		},
 		initSelection: function (element, callback) {
 			var data = [];
-			$(element.val().split(",")).each(function (v, a) {
-				data.push({Term: a});
+			$(element.val().split(",")).each(function () {
+
+				data.push({Term: this});
 			});
 			callback(data);
-		},
+		}
 	};
 })
 
@@ -186,57 +180,6 @@ angular.module('taxonomy', [
 		},
 		templateUrl: '/template/taxonomy/tag-selector.html',
 		controller: 'TagSelectorCtrl',
-		link: function(scope, element, attrs) {
-
-		}
-	};
-})
-
-.controller('TimelineTagSelectorCtrl', function($scope, TaxonomyResource) {
-	if($scope.terms !== undefined) {
-		var concat = "";
-		for(var i = 0;i < $scope.terms.length;i++) {
-			concat += $scope.terms[i].Term + ",";
-		}
-		$scope.terms = concat.substring(0, concat.length-1);
-	}
-	
-	$scope.timelineTagConfig = {
-		data: TaxonomyResource.query(),
-		multiple: true,
-		id: function(item) {
-			return item.Term;
-		},
-		formatResult: function(item) {
-			return item.Term;
-		},
-		formatSelection: function(item) {
-			return item.Term;
-		},
-		createSearchChoice: function(term) {
-			return {Term: term};
-		},
-		matcher: function(term, text, option) {
-			return option.Term.toUpperCase().indexOf(term.toUpperCase())>=0;
-		},
-		initSelection: function (element, callback) {
-			var data = [];
-			$(element.val().split(",")).each(function (v, a) {
-				data.push({Term: a});
-			});
-			callback(data);
-		},
-	};
-})
-
-.directive('timelineTagSelector', function() {
-	return {
-		restrict: 'E',
-		scope: {
-			terms: "="
-		},
-		templateUrl: '/template/taxonomy/timeline-tag-selector.html',
-		controller: 'TimelineTagSelectorCtrl',
 		link: function(scope, element, attrs) {
 
 		}

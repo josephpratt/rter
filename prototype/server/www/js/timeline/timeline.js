@@ -1,19 +1,15 @@
 angular.module('timeline', [
     'ng',
     'ui',
+    'map',
     'items',
-    'taxonomy',
-    'alerts',
-    'ngResource',
-    'sockjs',
-    'ui.bootstrap.accordion',
-    'ui.bootstrap.transition',
     'ui.slider',
-    'ui.select2',
-    'map'
+    'ui.bootstrap.accordion',
+    'ui.bootstrap.transition'
 ])
 
-.controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, ViewonlyItemDialog, TaxonomyRankingCache, TaxonomyResource) {
+.controller('TimelineCtrl', function($scope, $filter, $timeout, $element, ItemCache, ViewonlyItemDialog) {
+    // $scope.items = ItemCache.contents;
     $scope.mapFilterEnable = false;
 
     // modal window when clicking on timeline items
@@ -22,7 +18,7 @@ angular.module('timeline', [
     };
 
     // Attempt to make the timeline ID in the template a dynamic value
-    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
+    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term;
 
     /* BEGIN Section: tags for select2 tag box in Advanced Settings */
 
@@ -32,7 +28,6 @@ angular.module('timeline', [
     // Iterates through an items array, finds all unique tags then alphabetizes them
     function getTimelineTags(items) {
         if (items === undefined || items.length === 0) return;
-
         var array = [];
         var uniqueArray = [];
         // make an array of every item's Terms
@@ -130,7 +125,9 @@ angular.module('timeline', [
     // Also provides a public refresh method to maintain latest values in the timeline
     var TimelineManager = function (dayOffset, items) {
         if (items === undefined || items.length === 0) return;
-        console.log(items);
+
+        $element.find('#timeline').attr('id', $scope.timelineTerm);
+        var timelineID = "#" + $scope.timelineTerm;
 
         var dayOffset = dayOffset || 0;
         var timelineInstance = {};
@@ -157,23 +154,23 @@ angular.module('timeline', [
                 switch (timelineItem.Type) {
                     case "youtube":
                         var youtubeID = timelineItem.ContentURI.match(/\/watch\?v=([0-9a-zA-Z].*)/)[1];
-                        itemData.content = '<img id=\"' + timelineItem.ID + '\" src=\"http://img.youtube.com/vi/' + youtubeID + '/0.jpg\" width=\"50\" height=\"50\">';
+                        itemData.content = '<img id=\"' + timelineItem.ID + '_' + $scope.timelineTerm + '\" src=\"http://img.youtube.com/vi/' + youtubeID + '/0.jpg\" width=\"50\" height=\"50\">';
                         break;
                     case "generic":
                         if (timelineItem.ThumbnailURI !== undefined) {
-                            itemData.content = '<img id=\"' + timelineItem.ID + '\" src=\"' + timelineItem.ThumbnailURI + '\" width=\"50\" height=\"50\">';
+                            itemData.content = '<img id=\"' + timelineItem.ID + '_' + $scope.timelineTerm + '\" src=\"' + timelineItem.ThumbnailURI + '\" width=\"50\" height=\"50\">';
                         } else {
-                            itemData.content = '<div id=\"' + timelineItem.ID + '\">' + timelineItem.Type + '</div>';
+                            itemData.content = '<div id=\"' + timelineItem.ID + '_' + $scope.timelineTerm + '\">' + timelineItem.Type + '</div>';
                         }
                         break;
                     case "twitter":
-                        itemData.content = '<img id=\"' + timelineItem.ID + '\" src=\"/asset/twitter-search-logo.png\" width=\"50\" height=\"50\">';
+                        itemData.content = '<img id=\"' + timelineItem.ID + '_' + $scope.timelineTerm + '\" src=\"/asset/twitter-search-logo.png\" width=\"50\" height=\"50\">';
                         break;
                     case "raw":
                         if (timelineItem.ThumbnailURI !== undefined) {
-                            itemData.content = '<img id=\"' + timelineItem.ID + '\" src=\"' + timelineItem.ThumbnailURI + '\" width=\"50\" height=\"50\">';
+                            itemData.content = '<img id=\"' + timelineItem.ID + '_' + $scope.timelineTerm + '\" src=\"' + timelineItem.ThumbnailURI + '\" width=\"50\" height=\"50\">';
                         } else {
-                            itemData.content = '<div id=\"' + timelineItem.ID + '\">' + timelineItem.Type + '</div>';
+                            itemData.content = '<div id=\"' + timelineItem.ID + '_' + $scope.timelineTerm + '\">' + timelineItem.Type + '</div>';
                         }
                         break;
                 }
@@ -213,7 +210,6 @@ angular.module('timeline', [
             'width':  '100%',
             'height': '427px',
             'editable': false,
-            'box.align': 'left',
             'start': min,
             'end': max,
             'min': min,
@@ -224,8 +220,7 @@ angular.module('timeline', [
         
         // so... what seems to be happening is that dynamically changing the ID is a bad idea.
         // BUT the "$timline" cannot stay the same... there needs to be multiple timelines ids
-        $element.find('#timeline').attr('id', $scope.timelineTerm);
-        var timelineID = "#" + $scope.timelineTerm;
+        
         timelineInstance = new links.Timeline($(timelineID)[0]);
 
         // Handles the mouse zoom and drag on the timeline
@@ -241,7 +236,9 @@ angular.module('timeline', [
         // Matches the timeline item selection with the rtER item to display
         function onSelected(e) {
             if (!timelineInstance.getSelection()[0]) return;
-            var id = parseInt(timelineData[timelineInstance.getSelection()[0].row].content.match(/id="([0-9]*)"/)[1]);
+            console.log(timelineData[timelineInstance.getSelection()[0].row].content);
+            var divID = timelineData[timelineInstance.getSelection()[0].row].content.match(/id="([\w]*)"/)[1];
+            var id = parseInt(divID.match(/\d*/));
             var item;
             for (var i = 0; i < items.length; i++) {
                 if (id === items[i].ID) {
@@ -249,7 +246,7 @@ angular.module('timeline', [
                     break;
                 }
             }
-            var element = "#" + id;
+            var element = "#" + divID;
             // Fires the modal window
             $(element).click(function() {
                 // $scope.closeupItemDialog(item);
@@ -269,6 +266,8 @@ angular.module('timeline', [
         return {
             minTime: min,
             maxTime: max,
+            timelineData: timelineData,
+            timelineOptions: timelineOptions,
             refresh: function (items) {
                 // TODO: is there ANY way to decouple these $scope variables?
                 timelineOptions.start = $scope.timelineStartTime;
@@ -326,19 +325,19 @@ angular.module('timeline', [
 
     $scope.$watch('viewmode', function () {
         if ($scope.viewmode === 'timeline-view') {
-            console.log($scope.rankedItems);
-            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.rankedItems);
+            $scope.tags = $scope.tags || getTimelineTags($scope.filteredItems);
+            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.filteredItems);
+            // When an item is selected/updated in another view (for example clicking an item for the close up on
+            // grid-view) the timeline tries to draw itself, but since the element is hidden by ng-show it doesn't
+            // draw itself properly, so to solve this, I check for a valid timeline object and finalFilteredItems
+            // object, and refresh the timeline when switching to 'timeline-view'.
+            if ($scope.timeline && $scope.finalFilteredItems) {
+                $scope.timeline.refresh($scope.finalFilteredItems);
+            }
         }
     }, true);
 
-
-    $scope.$watch('rankedItems', function() {
-        // Initialize $scope.tags when we get items
-        
-        $scope.tags = $scope.tags || getTimelineTags($scope.rankedItems);
-    }, true);
-    
-    $scope.$watch('[rankedItems, timelineStartTime, timelineStopTime]', function () {
+    $scope.$watch('[filteredItems, timelineStartTime, timelineStopTime]', function () {
         if ($scope.timeline) {
             // Ensure that when the start/stop times are updated externally that they are clamped
             if ($scope.timelineStartTime < $scope.timeline.minTime) {
@@ -357,14 +356,14 @@ angular.module('timeline', [
             $scope.startDateString = getDateString($scope.timelineStartTime);
             $scope.stopDateString = getDateString($scope.timelineStopTime);
         }
-        $scope.filteredByTime = $filter('filterByTime')($scope.rankedItems, $scope.timelineStartTime, $scope.timelineStopTime);
+        $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
     }, true);
     
     // Apply type filter when filteredByTime or any of item types are updated in the Advanced Filtering
     $scope.$watch('[filteredByTime, generic, youtube, twitter, raw]', function () {
         $scope.filteredByType = $filter('filterByType')($scope.filteredByTime, $scope.typesToDisplay());
     }, true);
-    
+
     // Apply tag filter when filteredByType or tags is updated
     $scope.$watch('[filteredByType, tags]', function () {
         $scope.filteredByTag = $filter('filterByTag')($scope.filteredByType, $scope.tags);
@@ -375,12 +374,6 @@ angular.module('timeline', [
             $scope.mapItems = $filter('filterbyBounds')($scope.filteredByTag, $scope.mapBounds);
         } else {
             $scope.mapItems = $scope.filteredByTag;
-        }
-    }, true);
-
-    $scope.$watch('[mapFilteredItems, filterMode]', function() {
-        if($scope.filterMode == 'remove') {
-            $scope.finalFilteredItems = $scope.mapFilteredItems;
         }
     }, true);
 
@@ -427,7 +420,7 @@ angular.module('timeline', [
 
     // For updating the timeline ID
     $scope.$watch('term.Term', function() {
-        $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
+        $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term;
     }, true);
 
     /* END Section*/
@@ -436,10 +429,10 @@ angular.module('timeline', [
 .directive('timeline', function () {
     return {
         restrict: 'E',
-        transclude: true,
+        // transclude: true,
         scope: {
             term: '=',
-            rankedItems: '=',
+            filteredItems: '=',
             isCollapsed: '=',
             viewmode: '='
         },

@@ -1,4 +1,5 @@
 angular.module('items', [
+	// 'ui.select2',
 	'ui.bootstrap',         //dialog
 	'ngResource',           //$resource for Item
 	'sockjs',               //sock for ItemCache
