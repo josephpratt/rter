@@ -1,3 +1,7 @@
+// filtering by name is weird
+// it doesn't seem to remove them from the map, which isn't right
+// and blur remove is somewhat wierd as well
+
 angular.module('timeline', [
     'ng',
     'ui',
@@ -18,7 +22,7 @@ angular.module('timeline', [
     };
 
     // Attempt to make the timeline ID in the template a dynamic value
-    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term;
+    $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term.replace(/\:/, '_');
 
     /* BEGIN Section: tags for select2 tag box in Advanced Settings */
 
@@ -236,7 +240,6 @@ angular.module('timeline', [
         // Matches the timeline item selection with the rtER item to display
         function onSelected(e) {
             if (!timelineInstance.getSelection()[0]) return;
-            console.log(timelineData[timelineInstance.getSelection()[0].row].content);
             var divID = timelineData[timelineInstance.getSelection()[0].row].content.match(/id="([\w]*)"/)[1];
             var id = parseInt(divID.match(/\d*/));
             var item;
@@ -420,7 +423,7 @@ angular.module('timeline', [
 
     // For updating the timeline ID
     $scope.$watch('term.Term', function() {
-        $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term;
+        $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term.replace(/\:/, '_');
     }, true);
 
     /* END Section*/
