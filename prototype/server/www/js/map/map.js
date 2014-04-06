@@ -3,7 +3,7 @@ angular.module('map', [
     'ng'   //$timeout
 ])
 
-.controller('MapCtrl', function($scope, $timeout, $filter, CloseupItemDialog) {   
+.controller('MapCtrl', function($scope, $timeout, CloseupItemDialog) {
     $scope.closeupItemDialog = function(item) {
         CloseupItemDialog.open(item);
     };
@@ -58,7 +58,6 @@ angular.module('map', [
     };
 
     $scope.$watch('viewmode', function() {
-        $scope.boundsChanged();
         $scope.mapCenter = $scope.map.getCenter();
 
         $timeout(function() {

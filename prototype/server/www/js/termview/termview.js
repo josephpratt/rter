@@ -47,7 +47,7 @@ angular.module('termview', [
 
     $scope.viewmode = "grid-view";
     $scope.filterMode = "blur";
-    $scope.mapFilterEnable = false;
+    $scope.mapFilterEnabled = false;
 
     /* -- items and rankings  -- */
 
@@ -64,18 +64,12 @@ angular.module('termview', [
     }
 
     $scope.items = ItemCache.contents;
-
-    $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
-    $scope.orderedByID = $filter('orderBy')($scope.filteredItems, 'ID', true);
-    $scope.orderedByTime = $filter('orderBy')($scope.orderedByID, 'StartTime', true);
-
-    $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
-
-    $scope.finalMapItems = $scope.rankedItems;
-    $scope.finalFilteredItems = $scope.rankedItems;
-
-    $scope.textSearchedItems = $filter('filter')($scope.rankedItems, $scope.filterQuery);
-    $scope.mapItems = $filter('filterbyBounds')($scope.textSearchedItems, $scope.mapBounds);
+    $scope.filteredItems;
+    $scope.orderedByID;
+    $scope.orderedByTime;
+    $scope.rankedItems;
+    $scope.mapItems;
+    $scope.finalFilteredItems;
 
     $scope.$watch('items', function() {
         $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
@@ -85,36 +79,22 @@ angular.module('termview', [
 
     $scope.$watch('[ranking, orderedByTime]', function() {
         $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
+        console.log($scope.term.Term);
     }, true);
 
-    $scope.$watch('[rankedItems, filterMode]', function() {
-        if($scope.filterMode == 'blur') {
-            $scope.finalFilteredItems = $scope.rankedItems;
-            // $scope.finalMapItems = $scope.rankedItems;
+    $scope.$watch('[rankedItems, mapBounds, mapFilterEnabled, filterMode]', function() {
+        if($scope.mapFilterEnabled && $scope.filterMode === 'remove') {
+            $scope.mapItems = $filter('filterbyBounds')($scope.rankedItems, $scope.mapBounds);
+        } else {
+            $scope.mapItems = $scope.rankedItems;
         }
     }, true);
 
-     $scope.$watch('[rankedItems, mapBounds, mapFilterEnable, filterMode]', function() {
+    $scope.$watch('[mapItems, textQuery]', function() {
         if($scope.filterMode == 'remove') {
-            if($scope.mapFilterEnable) {
-                $scope.mapItems = $filter('filterbyBounds')($scope.rankedItems, $scope.mapBounds);
-            } else {
-                $scope.mapItems = $scope.rankedItems;
-            }
-        }
-    }, true);
-
-    $scope.$watch('[mapItems, textQuery, filterMode]', function() {
-        // if($scope.filterMode == 'remove') {
-            $scope.textSearchedItems = $filter('filter')($scope.mapItems, $scope.textQuery);
-        // }
-    }, true);
-
-   
-
-    $scope.$watch('[textSearchedItems, filterMode]', function() {
-        if($scope.filterMode == 'remove') {
-            $scope.finalFilteredItems = $scope.textSearchedItems;
+            $scope.finalFilteredItems = $filter('filter')($scope.mapItems, $scope.textQuery);
+        } else {
+            $scope.finalFilteredItems = $scope.mapItems;   
         }
     }, true);
 
@@ -123,18 +103,21 @@ angular.module('termview', [
 
         filtered = $filter('filter')(filtered, $scope.textQuery);
 
-        if($scope.mapFilterEnable) {
+        if($scope.mapFilterEnabled) {
             filtered = $filter('filterbyBounds')(filtered, $scope.mapBounds);
         }
 
-        if(filtered.length === 0) return true;
-        else return false;
+        if (filtered.length === 0) {
+            return true;
+        } else {
+            return false;
+        }
     };
 
     $scope.dragFreeze = false; //FIXME: Hack to fix drag bug with firefox http://forum.jquery.com/topic/jquery-ui-sortable-triggers-a-click-in-firefox-15
 
     $scope.dragCallback = function(e) {     
-        if($scope.filterMode == 'remove' && ($scope.mapFilterEnable || ($scope.textQuery !== undefined && $scope.textQuery !== ''))) { //TODO: This should have a blur options instead maybe?
+        if($scope.filterMode == 'remove' && ($scope.mapFilterEnabled || ($scope.textQuery !== undefined && $scope.textQuery !== ''))) { //TODO: This should have a blur options instead maybe?
             Alerter.warn("You cannot reorder items while your filters are enabled", 2000);
             return;
         }

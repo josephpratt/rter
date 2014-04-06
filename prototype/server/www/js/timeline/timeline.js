@@ -9,53 +9,20 @@ angular.module('timeline', [
     'ui.bootstrap.accordion',
     'ui.bootstrap.transition',
     'ui.slider',
+    'ui.select2',
     'map'
 ])
 
 .controller('TimelineCtrl', function($scope, $filter, $resource, $timeout, $element, Alerter, ItemCache, ViewonlyItemDialog, TaxonomyRankingCache, TaxonomyResource) {
     $scope.mapFilterEnable = false;
 
-    /* BEGIN Section: items and rankings */
-
-    // Set items to the current contents of the ItemCache
-    // $scope.items = ItemCache.contents;
-
-    // // Get rankings from items cache
-    // $scope.rankingCache = new TaxonomyRankingCache($scope.term.Term);
-
-    // $scope.$on("$destroy", function() {
-    //     if($scope.rankingCache.close !== undefined) $scope.rankingCache.close();
-    // });
-
-    // if($scope.term.Term === "" || $scope.term.Term === undefined) {
-    //     $scope.ranking = [];
-    // } else {
-    //     $scope.ranking = $scope.rankingCache.ranking;
-    // }
-
-    // $scope.items = $scope.rankedItems;
-
-    $scope.orderedByID;
-    $scope.orderedByTime;
-    $scope.rankedItems;
-    $scope.mapItems;
-    $scope.finalFilteredItems;
-
     // modal window when clicking on timeline items
     $scope.viewonlyItemDialog = function(item) {
         ViewonlyItemDialog.open(item);
     };
 
-    /* END Section*/
-
-
-    /* BEGIN Section: dynamic timeline ID */
-
     // Attempt to make the timeline ID in the template a dynamic value
     $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
-
-    /* END Section*/
-
 
     /* BEGIN Section: tags for select2 tag box in Advanced Settings */
 
@@ -128,7 +95,6 @@ angular.module('timeline', [
     }
 
     // Toggles the advanced filtering window
-    // $scope.isAdvancedCollapsed = true; // replaced by $scope.isCollapsed in termview.js
     $scope.isStartDateCollapsed = true;
     $scope.isStopDateCollapsed = true;
 
@@ -164,6 +130,7 @@ angular.module('timeline', [
     // Also provides a public refresh method to maintain latest values in the timeline
     var TimelineManager = function (dayOffset, items) {
         if (items === undefined || items.length === 0) return;
+        console.log(items);
 
         var dayOffset = dayOffset || 0;
         var timelineInstance = {};
@@ -357,16 +324,21 @@ angular.module('timeline', [
 
     /* BEGIN Section: $watch functions */
 
-    // 1. Get the items from termview (already filtered by )
+    $scope.$watch('viewmode', function () {
+        if ($scope.viewmode === 'timeline-view') {
+            console.log($scope.rankedItems);
+            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.rankedItems);
+        }
+    }, true);
+
 
     $scope.$watch('rankedItems', function() {
         // Initialize $scope.tags when we get items
+        
         $scope.tags = $scope.tags || getTimelineTags($scope.rankedItems);
-        $scope.filteredItems = $scope.rankedItems;
-        // $scope.filteredItems = $filter('filterByTerm')($scope.items, $scope.term.Term);
     }, true);
     
-    $scope.$watch('[filteredItems, timelineStartTime, timelineStopTime]', function () {
+    $scope.$watch('[rankedItems, timelineStartTime, timelineStopTime]', function () {
         if ($scope.timeline) {
             // Ensure that when the start/stop times are updated externally that they are clamped
             if ($scope.timelineStartTime < $scope.timeline.minTime) {
@@ -385,8 +357,7 @@ angular.module('timeline', [
             $scope.startDateString = getDateString($scope.timelineStartTime);
             $scope.stopDateString = getDateString($scope.timelineStopTime);
         }
-        $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
-        console.log($scope.filteredByTime);
+        $scope.filteredByTime = $filter('filterByTime')($scope.rankedItems, $scope.timelineStartTime, $scope.timelineStopTime);
     }, true);
     
     // Apply type filter when filteredByTime or any of item types are updated in the Advanced Filtering
@@ -396,16 +367,8 @@ angular.module('timeline', [
     
     // Apply tag filter when filteredByType or tags is updated
     $scope.$watch('[filteredByType, tags]', function () {
-
         $scope.filteredByTag = $filter('filterByTag')($scope.filteredByType, $scope.tags);
-        // $scope.orderedByID = $filter('orderBy')($scope.filteredByTag, 'ID', true);
-        // $scope.orderedByTime = $filter('orderBy')($scope.orderedByID, 'StartTime', true);
     }, true);
-
-    // Apply ranking filter when orderedByTime is updated
-    // $scope.$watch('[ranking, orderedByTime]', function() {
-    //     // $scope.rankedItems = $filter('orderByRanking')($scope.orderedByTime, $scope.ranking);
-    // }, true);
 
     $scope.$watch('[filteredByTag, mapBounds, mapFilterEnable]', function() {
         if($scope.mapFilterEnable) {
@@ -462,17 +425,9 @@ angular.module('timeline', [
         }
     }, true);
 
-    // For updating the timeline ID (Still not working...)
+    // For updating the timeline ID
     $scope.$watch('term.Term', function() {
         $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline-" + $scope.term.Term;
-    }, true);
-
-    $scope.$watch('[viewmode]', function () {
-        if ($scope.viewmode === 'timeline-view') {
-            // when we add the OR logic, the timeline doesn't repopulate with ALL the items when in a term tab,
-            // Unsure of other side-effects atm, but I'm pretty sure there are some.
-            $scope.timeline = $scope.timeline || TimelineManager(3, $scope.rankedItems);
-        }
     }, true);
 
     /* END Section*/
