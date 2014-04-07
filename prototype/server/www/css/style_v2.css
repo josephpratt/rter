@@ -116,7 +116,55 @@ label {
 	font-size: 10pt;
 }
 
-/* -- Term View Controls -- */
+/* -- Timeline Advanced Filtering Controls -- */
+
+.ui-slider {
+        height: .4em;
+        margin: 10px 5px;
+    }
+    
+.ui-slider .ui-slider-handle {
+    border-color: #729fcf;
+    position: absolute;
+    z-index: 2;
+    width: .8em;
+    height: .8em;
+    cursor: default;
+    
+}
+
+.timeline-view {
+    padding-top: 15px;
+}
+
+.slider-val {
+    text-align:center; width: 20px
+}
+
+.ui-slider-container {
+    margin: 10px 5px;
+}
+
+.date-string {
+    text-align:center;
+    width: 115%;
+}
+
+.date-string-input {
+    text-align:center;
+    width: 20px
+}
+
+.date-close {
+    padding-top:83%;
+}
+
+.select-date {
+    padding-bottom: 10px;
+}
+
+
+/* -- Term View and Timeline Controls -- */
 
 .term-view .grid-view .right, .term-view .list-view .right {
 	padding-top: 15px;
