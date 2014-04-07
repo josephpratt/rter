@@ -1,7 +1,3 @@
-// filtering by name is weird
-// it doesn't seem to remove them from the map, which isn't right
-// and blur remove is somewhat wierd as well
-
 angular.module('timeline', [
     'ng',
     'ui',
@@ -13,18 +9,18 @@ angular.module('timeline', [
 ])
 
 .controller('TimelineCtrl', function($scope, $filter, $timeout, $element, ItemCache, ViewonlyItemDialog) {
-    // $scope.items = ItemCache.contents;
     $scope.mapFilterEnable = false;
 
-    // modal window when clicking on timeline items
+    // Modal window when clicking on timeline items
     $scope.viewonlyItemDialog = function(item) {
         ViewonlyItemDialog.open(item);
     };
 
-    // Attempt to make the timeline ID in the template a dynamic value
+    // Dynamic ID values for the timeline and internal timeline items.
     $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term.replace(/^\w/, '_');
 
-    /* BEGIN Section: tags for select2 tag box in Advanced Settings */
+
+    /* BEGIN Section: Tags for select2 tag box in Advanced Settings */
 
     // Holds all tags (terms) of the current items displayed on the screen
     $scope.tags;
@@ -34,14 +30,14 @@ angular.module('timeline', [
         if (items === undefined || items.length === 0) return;
         var array = [];
         var uniqueArray = [];
-        // make an array of every item's Terms
+        // Make an array of every item's Terms
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
             for (var j = 0; j < item.Terms.length; j++) {
                 array.push({'Term': item.Terms[j].Term});
             }
         }
-        // check for duplicates, only push unique values
+        // Check for duplicates, only push unique values
         for(var i = 0; i < array.length; i++) {
             for(var j = i + 1; j < array.length; j++) {
                 if (array[i].Term === array[j].Term) {
@@ -50,7 +46,7 @@ angular.module('timeline', [
             }       
             uniqueArray.push(array[i]);
         }
-        // sort alphabetically
+        // Sort alphabetically
         uniqueArray.sort(function(a, b) {
             var termA = a.Term.toLowerCase();
             var termB = b.Term.toLowerCase();
@@ -68,9 +64,9 @@ angular.module('timeline', [
     /* END Section*/
 
 
-    /* BEGIN Section: values for Advanced Filtering controls */
+    /* BEGIN Section: Values for Advanced Filtering controls */
 
-    // slider values for manipulating hours and minutes
+    // Slider values for manipulating hours and minutes
     $scope.sliderStartVal;
     $scope.sliderStartMinVal;
     $scope.sliderStopVal;
@@ -121,7 +117,8 @@ angular.module('timeline', [
     /* END Section*/
 
 
-    /* BEGIN Section:timeline library manager -- */
+    /* BEGIN Section: Timeline library manager -- */
+
     // Main timeline object
     $scope.timeline;
 
@@ -130,6 +127,7 @@ angular.module('timeline', [
     var TimelineManager = function (dayOffset, items) {
         if (items === undefined || items.length === 0) return;
 
+        // Get the current div ID and replace it with a dynamic one.
         $element.find('#timeline').attr('id', $scope.timelineTerm);
         var timelineID = "#" + $scope.timelineTerm;
 
@@ -140,8 +138,8 @@ angular.module('timeline', [
         var min = Date.now();
         var max = new Date(0);
 
-        // Concerts items data into an timelineData array, which the timeline.js library handles
-        // possibly allow changes to editable, style, content, group in parameters
+        // Converts item's data into an timelineData array, which the timeline.js library handles
+        // Possibly allow changes to editable, style, content, group in parameters
         function getTimelineData(items) {
             for (var i = 0; i < items.length; i++) {
                 var timelineItem = items[i];
@@ -186,7 +184,7 @@ angular.module('timeline', [
             }
         }
 
-        // Start initialization of timeline data
+        // Initialization of timeline data
         // Get min and max date objects for the outer boundaries of the timeline
         for (var i = 0; i < items.length; i++) {
             if (items[i].StartTime.getTime() < min) {
@@ -202,11 +200,11 @@ angular.module('timeline', [
         min = new Date(min)
         max = new Date(max)
 
-        // TODO: is there ANY way to decouple these $scope variables?
+        // TODO: Is there ANY way to decouple these $scope variables?
         $scope.timelineStartTime = min;
         $scope.timelineStopTime = max;
 
-        // Populate the timeline with the data
+        // Form the timeline data
         getTimelineData(items);
 
         // TODO: Make Height variable/adjustable?
@@ -221,10 +219,6 @@ angular.module('timeline', [
         };
 
         // Instantiate our timelineInstance object.
-        
-        // so... what seems to be happening is that dynamically changing the ID is a bad idea.
-        // BUT the "$timline" cannot stay the same... there needs to be multiple timelines ids
-        
         timelineInstance = new links.Timeline($(timelineID)[0]);
 
         // Handles the mouse zoom and drag on the timeline
@@ -240,9 +234,12 @@ angular.module('timeline', [
         // Matches the timeline item selection with the rtER item to display
         function onSelected(e) {
             if (!timelineInstance.getSelection()[0]) return;
+            // Get the div ID
             var divID = timelineData[timelineInstance.getSelection()[0].row].content.match(/id="([\w]*)"/)[1];
+            // Get the Item.ID
             var id = parseInt(divID.match(/\d*/));
             var item;
+            // Find the item
             for (var i = 0; i < items.length; i++) {
                 if (id === items[i].ID) {
                     item = items[i];
@@ -373,6 +370,7 @@ angular.module('timeline', [
     }, true);
 
     $scope.$watch('[filteredByTag, mapBounds, mapFilterEnable]', function() {
+        // Only check map bounds if the map filter is enabled
         if($scope.mapFilterEnable) {
             $scope.mapItems = $filter('filterbyBounds')($scope.filteredByTag, $scope.mapBounds);
         } else {
@@ -380,7 +378,7 @@ angular.module('timeline', [
         }
     }, true);
 
-    // Updates finalFilteredItems
+    // TODO: This seems redundant. Could we just skip finalFilteredItems and use the mapItems variable?
     $scope.$watch('mapItems', function() {
         $scope.finalFilteredItems = $scope.mapItems;
         // Ensure finalFilteredItems and timeline are proper objects before performing refresh
@@ -432,7 +430,6 @@ angular.module('timeline', [
 .directive('timeline', function () {
     return {
         restrict: 'E',
-        // transclude: true,
         scope: {
             term: '=',
             filteredItems: '=',

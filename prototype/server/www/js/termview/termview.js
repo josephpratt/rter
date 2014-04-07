@@ -1,10 +1,10 @@
 angular.module('termview', [
     'ng',       //filers
     'ui',       //ui-sortable and google map
-    'items',    //ItemCache to load items into termview, various itemDialog services
-    'taxonomy', //Rankings
-    'alerts',   //Alerter
     'map',      //map ctrl
+    'items',    //ItemCache to load items into termview, various itemDialog services
+    'alerts',   //Alerter
+    'taxonomy', //Rankings
     'timeline',
     'ui.select2'
 ])
@@ -167,7 +167,7 @@ angular.module('termview', [
         templateUrl: '/template/termview/termview.html',
         controller: 'TermViewCtrl',
         link: function(scope, element, attrs) {
-            // navigator.geolocation.getCurrentPosition(scope.centerAt);
+            
         }
     };
 });

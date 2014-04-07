@@ -44,6 +44,7 @@ angular.module('items', [
 	);
 })
 
+// Currently there are only 4 media types that can be filtered
 .filter('filterByType', function() {
 	return function (input, typesToDisplay) {
 		var out = [];
@@ -88,6 +89,7 @@ angular.module('items', [
 	};
 })
 
+// Potentially Big-O n^3! Is there a better way?
 .filter('filterByTag', function() {
 	return function (input, tagsArray) {
 		if (tagsArray === undefined) return input;

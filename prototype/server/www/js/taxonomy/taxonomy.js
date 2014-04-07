@@ -1,6 +1,6 @@
 angular.module('taxonomy', [
-	'ngResource', //$resource for taxonomoy
-	'sockjs' //sock for TaxonomyRankingCache
+	'sockjs', //sock for TaxonomyRankingCache
+	'ngResource' //$resource for taxonomoy
 ])
 
 .factory('TaxonomyRankingResource', function ($resource) {
@@ -143,9 +143,9 @@ angular.module('taxonomy', [
 })
 
 .controller('TagListCtrl', function($scope) {
-	$scope.tagList = '';
+	// This uses the item object to get the tags (Terms) from the Terms array.
+	$scope.tagList = "";
 	function getRawItemTags(tags) {
-		console.log(tags);
 		if (!tags || tags.Terms.length === 0) return;
 		var terms = "";
 		for (var i = 0; i < tags.Terms.length; i++) {
@@ -196,7 +196,6 @@ angular.module('taxonomy', [
 		initSelection: function (element, callback) {
 			var data = [];
 			$(element.val().split(",")).each(function () {
-
 				data.push({Term: this});
 			});
 			callback(data);
