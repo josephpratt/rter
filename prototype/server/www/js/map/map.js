@@ -3,9 +3,14 @@ angular.module('map', [
     'ng'   //$timeout
 ])
 
-.controller('MapCtrl', function($scope, $timeout, CloseupItemDialog) {
+.controller('MapCtrl', function($scope, $timeout, CloseupItemDialog, ViewonlyItemDialog) {
     $scope.closeupItemDialog = function(item) {
-        CloseupItemDialog.open(item);
+        if ($scope.viewmode !== 'timeline-view') {
+            CloseupItemDialog.open(item);
+        } else {
+            ViewonlyItemDialog.open(item);
+        }
+        
     };
     
     $scope.boundsChanged = function() {
