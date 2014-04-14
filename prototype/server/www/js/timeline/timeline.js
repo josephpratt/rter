@@ -8,7 +8,7 @@ angular.module('timeline', [
     'ui.bootstrap.transition'
 ])
 
-.controller('TimelineCtrl', function($scope, $filter, $timeout, $element, ItemCache, ViewonlyItemDialog) {
+.controller('TimelineCtrl', function($scope, $filter, $element, ViewonlyItemDialog) {
     $scope.mapFilterEnable = false;
 
     // Modal window when clicking on timeline items
@@ -109,15 +109,14 @@ angular.module('timeline', [
         };
     };
 
-    // Start and stop times
-    // Can be updated by the timeline, items, date/time picker
+    // Start and stop times can be updated by the timeline, items, and date/time picker
     $scope.timelineStartTime;
     $scope.timelineStopTime;
 
     /* END Section*/
 
 
-    /* BEGIN Section: Timeline library manager -- */
+    /* BEGIN Section: Timeline library manager */
 
     // Main timeline object
     $scope.timeline;
@@ -179,7 +178,7 @@ angular.module('timeline', [
                 // itemData.group = timelineItem.Type;
                 // itemData.className = '.red { background-color: red; border-color: dark-red; }' // custom CSS
                 itemData.editable = false;
-
+                
                 timelineData.push(itemData);
             }
         }
@@ -204,7 +203,7 @@ angular.module('timeline', [
         $scope.timelineStartTime = min;
         $scope.timelineStopTime = max;
 
-        // Form the timeline data
+        // Translate the items into timeline data
         getTimelineData(items);
 
         // TODO: Make Height variable/adjustable?
@@ -249,25 +248,22 @@ angular.module('timeline', [
             var element = "#" + divID;
             // Fires the modal window
             $(element).click(function() {
-                // $scope.closeupItemDialog(item);
                 // TODO: is there ANY way to decouple these $scope variables?
                 $scope.viewonlyItemDialog(item);
                 $scope.$apply();
             });
         }
 
-        // attach event listeners using the links events handler
+        // Attach event listeners using the links events handler
         links.events.addListener(timelineInstance, 'rangechanged', onRangeChanged);
         links.events.addListener(timelineInstance, 'select', onSelected);
 
         // Draw our timeline with the created data and options
         timelineInstance.draw(timelineData, timelineOptions);
-        $scope.checked = true;
+
         return {
             minTime: min,
             maxTime: max,
-            timelineData: timelineData,
-            timelineOptions: timelineOptions,
             refresh: function (items) {
                 // TODO: is there ANY way to decouple these $scope variables?
                 timelineOptions.start = $scope.timelineStartTime;
@@ -282,7 +278,7 @@ angular.module('timeline', [
     /* END Section*/
 
 
-    /* BEGIN Section: Preliminary section for Bookmark feature */
+    /* BEGIN Section: Preliminary section for Bookmark/Snapshot feature */
 
     // Holds the search query criteria selected in the dropdown menu
     $scope.querySelected = [];
@@ -327,9 +323,9 @@ angular.module('timeline', [
         if ($scope.viewmode === 'timeline-view') {
             $scope.tags = $scope.tags || getTimelineTags($scope.filteredItems);
             $scope.timeline = $scope.timeline || TimelineManager(3, $scope.filteredItems);
-            // When an item is selected/updated in another view (for example clicking an item for the close up on
+            // When an item is selected/updated in another view (for example clicking an item for the close-up on
             // grid-view) the timeline tries to draw itself, but since the element is hidden by ng-show it doesn't
-            // draw itself properly, so to solve this, I check for a valid timeline object and finalFilteredItems
+            // draw itself properly. To solve this, I check for a valid timeline object and finalFilteredItems
             // object, and refresh the timeline when switching to 'timeline-view'.
             if ($scope.timeline && $scope.finalFilteredItems) {
                 $scope.timeline.refresh($scope.finalFilteredItems);
@@ -338,8 +334,8 @@ angular.module('timeline', [
     }, true);
 
     $scope.$watch('[filteredItems, timelineStartTime, timelineStopTime]', function () {
+        // Ensure that when the start/stop times are updated externally that they are clamped to the min/max times
         if ($scope.timeline) {
-            // Ensure that when the start/stop times are updated externally that they are clamped
             if ($scope.timelineStartTime < $scope.timeline.minTime) {
                 $scope.timelineStartTime = $scope.timeline.minTime;
             }
@@ -347,7 +343,7 @@ angular.module('timeline', [
                 $scope.timelineStopTime = $scope.timeline.maxTime;
             }
         }
-        // Ensure timelineStartTime and timelineStopTime are defined before getting/setting date values
+        // Ensure timelineStartTime and timelineStopTime are instantiated as an object (Date) before getting/setting date values
         if ($scope.timelineStartTime && $scope.timelineStopTime) {
             $scope.sliderStartVal = $scope.timelineStartTime.getHours();
             $scope.sliderStartMinVal = $scope.timelineStartTime.getMinutes();
@@ -359,12 +355,10 @@ angular.module('timeline', [
         $scope.filteredByTime = $filter('filterByTime')($scope.filteredItems, $scope.timelineStartTime, $scope.timelineStopTime);
     }, true);
     
-    // Apply type filter when filteredByTime or any of item types are updated in the Advanced Filtering
     $scope.$watch('[filteredByTime, generic, youtube, twitter, raw]', function () {
         $scope.filteredByType = $filter('filterByType')($scope.filteredByTime, $scope.typesToDisplay());
     }, true);
 
-    // Apply tag filter when filteredByType or tags is updated
     $scope.$watch('[filteredByType, tags]', function () {
         $scope.filteredByTag = $filter('filterByTag')($scope.filteredByType, $scope.tags);
     }, true);
@@ -419,7 +413,7 @@ angular.module('timeline', [
         }
     }, true);
 
-    // For updating the timeline ID
+    // Alloww the timeline ID to be unique per term
     $scope.$watch('term.Term', function() {
         $scope.timelineTerm = $scope.term.Term === "" ? "timeline" : "timeline_" + $scope.term.Term.replace(/\:/, '_');
     }, true);
